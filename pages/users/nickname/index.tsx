@@ -38,7 +38,7 @@ const Page: NextPage<StatusNickStatus> = (props) => {
                                 try {
                                     if (!props.secure) throw new Error()
                                     const headers = { headers: { Authorization: `Bearer ${props.token}` }};
-                                    axios.put(`${endpoint}/users/${props.id}/nickname?nickname=${name}`,{}, headers).then(() => router.push("/"))
+                                    axios.put(`${endpoint}/users/${props.id}/nickname?nickname=${name}`,{}, headers).then(() => router.push("/success"))
                                 } catch(e) {
                                     console.error(e)
                                     toast({
