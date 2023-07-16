@@ -1,4 +1,4 @@
-import FirebaseApp from '../../lib/FirebaseApp'
+import FirebaseApp from '../../utils/FirebaseApp'
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import Link from 'next/link'
 import { useState } from 'react'
@@ -57,7 +57,7 @@ const Home = () => {
             })
     }
     return (
-    <VStack margin="20px">
+    <VStack padding="20px">
         <VStack width="80vw">
             {!parseCookies().idToken ? (
                 <>
@@ -77,7 +77,7 @@ const Home = () => {
                                 </InputRightElement>
                             </InputGroup>
                             <InputGroup>
-                                <Button marginLeft="auto" marginRight="10px" onClick={handleLogin}>Login</Button>
+                                <Button marginLeft="auto" marginRight="10px" backgroundColor={"white"} onClick={handleLogin}>Login</Button>
                             </InputGroup>
                         </Stack>
                     </FormControl>

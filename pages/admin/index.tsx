@@ -1,152 +1,115 @@
-import type { GetServerSideProps, NextPage } from 'next'
-import type { User, Dealer, Transaction } from '../../types/api'
-import { parseCookies, destroyCookie } from 'nookies'
-import Link from 'next/link'
-import { Box, Button, HStack, Heading, Stack, VStack } from '@chakra-ui/react'
-import DrawerMenu from '../../components/DrawerMenu'
+import { Button, Card, CardBody, CardFooter, CardHeader, Heading, Link, SimpleGrid, Text, VStack } from "@chakra-ui/react"
+import { GetServerSideProps, NextPage } from "next"
+import { parseCookies, destroyCookie } from "nookies"
 import Router from 'next/router'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-} from "chart.js"
-import { Bar } from "react-chartjs-2"
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-interface Props {
-  graphData: GraphData
-}
-
-interface JsonedData {
-  time_label: number
-  outflow: number
-}
-
-interface dataset {
-  label: string
-  data: number[]
-  borderColor: string
-  backgroundColor: string
-  yAxisID: string
-}
-
-interface GraphData {
-  labels: string[]
-  datasets: dataset[]
-}
-
-const parseDate = (ms_date: number) => {
-  const date = new Date(ms_date + 1000*3600*9)
-  return `${date.getDate()}日${date.getHours()}時`
-}
-
-const Navigation = () => (
-  <Stack as="nav">
-    <Box rounded="base" fontSize="20px"><Link href="/admin">Edit Money</Link></Box>
-    <Box rounded="base" fontSize="20px"><Link href="/admin">Reset User</Link></Box>
-    <Box rounded="base" fontSize="20px"><Link href="/admin">Show History</Link></Box>
-    <Box rounded="base" fontSize="20px"><Link href="/admin">Settings</Link></Box>
-    <Box rounded="base" fontSize="20px"><Link href="/admin">DashBoard</Link></Box>
-  </Stack>
-)
-
-const Home: NextPage<Props> = ({graphData}) => {
-  const options = {
-    responsive: true,
-    interaction: {
-        mode: 'index' as const,
-        intersect: false,
-    },
-    stacked: false,
-    plugins: {
-        title: {
-        display: true,
-        text: 'Hourly OutFlows',
-        },
-    }
-  }
-
-  return (
-      <Stack>
-        <HStack background='blue.100'>
-          <Box ml="10px"><DrawerMenu><Navigation/></DrawerMenu></Box>
-          <Heading width="100wv" marginY="10px" marginLeft="10px">電物カジノ</Heading>
-          <Button ml="auto" mr="10px" bgColor="white" onClick={() => {
-            destroyCookie(null, "idToken")
-            Router.push("/admin/login")
-          }}>Logout</Button>
-        </HStack>
+const Page: NextPage = () => {
+    return (
         <VStack>
-          <Bar options={options} data={graphData}></Bar>
+            <SimpleGrid columns={[1,3]} spacing="40px" margin="20px">
+                <Card width={200}>
+                    <CardHeader>
+                        <Heading size={"md"}>決済</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Text>QRコードを読み込んで決済する</Text>
+                    </CardBody>
+                    <CardFooter>
+                        <Button bgColor={"yellow.400"} onClick={() => {
+                            window.open('/', '決済', 'popup=true')
+                        }}>
+                            Click
+                        </Button>
+                    </CardFooter>
+                </Card>
+                <Card width={200}>
+                    <CardHeader>
+                        <Heading size={"md"}>ユーザー</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Text>QRコードを読み取ってユーザーの情報を確認する</Text>
+                    </CardBody>
+                    <CardFooter>
+                        <Button bgColor={"purple.400"}>
+                            Click
+                        </Button>
+                    </CardFooter>
+                </Card>
+                <Card width={200}>
+                    <CardHeader>
+                        <Heading size={"md"}>店舗</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Text>店舗の追加や削除をする</Text>
+                    </CardBody>
+                    <CardFooter>
+                        <Button bgColor={"lightgreen"}>
+                            Click
+                        </Button>
+                    </CardFooter>
+                </Card>
+                <Card width={200}>
+                    <CardHeader>
+                        <Heading size={"md"}>アカウント</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Text>ユーザーアカウントの作成や削除をする</Text>
+                    </CardBody>
+                    <CardFooter>
+                        <Button bgColor={"lightblue"}>
+                            Click
+                        </Button>
+                    </CardFooter>
+                </Card>
+                <Card width={200}>
+                    <CardHeader>
+                        <Heading size={"md"}>情報</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Text>サーバーの負荷状況や運営の損失を確認する</Text>
+                    </CardBody>
+                    <CardFooter>
+                        <Button bgColor={"blue.500"}>
+                            Click
+                        </Button>
+                    </CardFooter>
+                </Card>
+                <Card width={200}>
+                    <CardHeader>
+                        <Heading size={"md"}>ログアウト</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Text>管理アカウントをログアウトする</Text>
+                    </CardBody>
+                    <CardFooter>
+                        <Button bgColor={"red.400"} onClick={() => {
+                            destroyCookie(null, 'idToken')
+                            Router.push("/admin/login")
+                        }}>
+                            Click
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </SimpleGrid>
         </VStack>
-      </Stack>
-  )
+    )
 }
 
-export const getServerSideProps: GetServerSideProps = async ctx => {
-  const idToken = parseCookies(ctx).idToken
-  if (!idToken) {
+export const getServerSideProps: GetServerSideProps<{hoge: null}> = async ctx => {
+    const idToken = parseCookies(ctx).idToken
+    if (!idToken) {
+        return {
+            redirect: {
+                permanent: false,
+                destination: '/admin/login'
+            }
+        }
+    }
     return {
-      redirect: {
-        permanent: false,
-        destination: '/admin/login'
-      }
+        props: {
+            hoge: null
+        }
     }
-  }
-  const users: User[] = await (await fetch("https://money-manager-api.takatsuki.club/users", {headers: {"Authorization": `Bearer ${idToken}`}})).json()
-  const jsonedDatas: JsonedData[] = []
-  await Promise.all(users.map(async user => {
-    if (user.having_money <= 3000) return
-    const tsUser: User = await (await fetch(`https://money-manager-api.takatsuki.club/users/${user.user_id}`)).json()
-    tsUser.transaction_history?.forEach(transaction => {
-      const roundedTimestamp = Math.floor(Date.parse(transaction.timestamp) / 3600 / 1000) * 3600 * 1000
-      if (!jsonedDatas.some(data => data.time_label === roundedTimestamp)) {
-        jsonedDatas.push({
-          time_label: roundedTimestamp,
-          outflow: ["bet", "payment"].includes(transaction.type)? 3000-transaction.amount: transaction.amount-3000,
-        })
-      } else {
-        jsonedDatas[jsonedDatas.findIndex(data => data.time_label === roundedTimestamp)].outflow += ["bet", "payment"].includes(transaction.type)? 3000-transaction.amount: transaction.amount-3000
-      }
-    })
-  }))
-  
-  
-  const graphData: GraphData = {
-    labels: [],
-    datasets: [
-      {
-        label: "OutFlows",
-        data: [],
-        borderColor: "red",
-        backgroundColor: "rgba(255, 0, 0, 0.5)",
-        yAxisID: 'y1'
-      }
-    ]
-  }
-  jsonedDatas.sort((a, b) => a.time_label < b.time_label ? -1: 1)
-  jsonedDatas.forEach(data => {
-    graphData.labels.push(parseDate(data.time_label))
-    graphData.datasets[0].data.push(data.outflow)
-  })
-
-  return {
-    props: {
-      graphData
-    }
-  }
 }
 
-export default Home
+export default Page
