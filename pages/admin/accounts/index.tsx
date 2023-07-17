@@ -48,33 +48,6 @@ const Page: NextPage<StatusUsersProps> = (props) => {
             <VStack spacing={5}>
                 <Spacer />
                 <Center>
-                    <IconButton
-                        bgColor={"#949494"}
-                        _hover={{ bg: "gray.300" }}
-                        size="md"
-                        aria-label="Reloading"
-                        icon={<RepeatClockIcon />}
-                        isLoading={isLoading}
-                        onClick={async () => {
-                            setIsLoading(true);
-                            const headers = {
-                                headers: {
-                                    Authorization: `Bearer ${props.idToken}`,
-                                },
-                            };
-                            axios
-                                .get(`${endpoint}/users`, headers)
-                                .then((res) => {
-                                    setUsers(res.data);
-                                    setIsLoading(false);
-                                    toast({
-                                        title: "Reloaded!",
-                                        status: "success",
-                                        position: "bottom-right",
-                                    });
-                                });
-                        }}
-                    />
                     <FormControl>
                         <InputGroup borderRadius={5}>
                             <InputLeftElement
@@ -89,16 +62,33 @@ const Page: NextPage<StatusUsersProps> = (props) => {
                                 shadow={"md"}
                                 bgColor={"white"}
                             />
-                            <InputRightAddon p={0}>
-                                <Button
-                                    shadow={"md"}
-                                    borderLeftRadius={0}
-                                    bgColor={"#949494"}
-                                    _hover={{ bg: "gray.300" }}
-                                >
-                                    検索
-                                </Button>
-                            </InputRightAddon>
+                            <IconButton
+                                bgColor={"#949494"}
+                                _hover={{ bg: "gray.300" }}
+                                size="md"
+                                aria-label="Reloading"
+                                icon={<RepeatClockIcon />}
+                                isLoading={isLoading}
+                                onClick={async () => {
+                                    setIsLoading(true);
+                                    const headers = {
+                                        headers: {
+                                            Authorization: `Bearer ${props.idToken}`,
+                                        },
+                                    };
+                                    axios
+                                        .get(`${endpoint}/users`, headers)
+                                        .then((res) => {
+                                            setUsers(res.data);
+                                            setIsLoading(false);
+                                            toast({
+                                                title: "Reloaded!",
+                                                status: "success",
+                                                position: "bottom-right",
+                                            });
+                                        });
+                                }}
+                            />
                         </InputGroup>
                     </FormControl>
                 </Center>
@@ -107,15 +97,21 @@ const Page: NextPage<StatusUsersProps> = (props) => {
             </VStack>
             <Center>
                 <SimpleGrid columns={4} spacingX={"40px"} spacingY={"60px"}>
-                    {users.map((e) => (
-                        <AccountItem
-                            name={e.nickname}
-                            amount={e.having_money}
-                            id={e.user_id}
-                            token={props.idToken}
-                            key={e.user_id}
-                        />
-                    ))}
+                    {users
+                        .filter(
+                            (e) =>
+                                e.nickname.includes(keyword) ||
+                                e.user_id.includes(keyword)
+                        )
+                        .map((e) => (
+                            <AccountItem
+                                name={e.nickname}
+                                amount={e.having_money}
+                                id={e.user_id}
+                                token={props.idToken}
+                                key={e.user_id}
+                            />
+                        ))}
                 </SimpleGrid>
             </Center>
         </>
