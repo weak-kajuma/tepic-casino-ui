@@ -16,43 +16,64 @@ import NextLink from "next/link";
 import { TransactionItem } from "../components/TransactionItem";
 import { Spacer } from "@chakra-ui/react";
 import { MobileFooter } from "../components/MobileFooter";
+import { Transaction } from "../types/api";
+import { GetServerSideProps, NextPage } from "next";
+import { useState } from "react";
 
-const Page = () => {
+const endpoint = "https://money-manager-api.takatsuki.club";
+
+type StatusLatestTransactions = {
+    transactions: Transaction[];
+};
+
+const Page: NextPage<StatusLatestTransactions> = (props) => {
+    const [transactions, setTransactions] = useState<Transaction[]>(
+        props.transactions
+    );
+    const [loadIndex, setLoadIndex] = useState<number>(5);
+    const [isEmpty, setIsEmpty] = useState<boolean>(false);
+
+    const onReadMore = async () => {
+        if (loadIndex >= 100) {
+            setIsEmpty(true);
+        } else {
+            setLoadIndex(loadIndex + 5);
+        }
+    };
+
     return (
         <>
             <BrowserView>
                 <VStack>
-                    <SimpleGrid columns={[1,2]} spacing="40px" margin="20px">
-                            <Card width={200}>
-                                <CardHeader>
-                                    <Heading size={"md"}>ランキング</Heading>
-                                </CardHeader>
-                                <CardBody>
-                                    <Text>
-                                        全プレイヤーの所持金ランキングを確認する
-                                    </Text>
-                                </CardBody>
-                                <CardFooter>
-                                    <Link as={NextLink} href="/games/ranking">
-                                        <Button bgColor={"yellow.400"}>
-                                            Click
-                                        </Button>
-                                    </Link>
-                                </CardFooter>
-                            </Card>
-                            <Card width={200}>
-                                <CardHeader>
-                                    <Heading size={"md"}>店舗</Heading>
-                                </CardHeader>
-                                <CardBody>
-                                    <Text>遊べる全ての店舗を確認する</Text>
-                                </CardBody>
-                                <CardFooter>
-                                    <Button bgColor={"purple.400"}>
+                    <SimpleGrid columns={[1, 2]} spacing="40px" margin="20px">
+                        <Card width={200}>
+                            <CardHeader>
+                                <Heading size={"md"}>ランキング</Heading>
+                            </CardHeader>
+                            <CardBody>
+                                <Text>
+                                    全プレイヤーの所持金ランキングを確認する
+                                </Text>
+                            </CardBody>
+                            <CardFooter>
+                                <Link as={NextLink} href="/games/ranking">
+                                    <Button bgColor={"yellow.400"}>
                                         Click
                                     </Button>
-                                </CardFooter>
-                            </Card>
+                                </Link>
+                            </CardFooter>
+                        </Card>
+                        <Card width={200}>
+                            <CardHeader>
+                                <Heading size={"md"}>店舗</Heading>
+                            </CardHeader>
+                            <CardBody>
+                                <Text>遊べる全ての店舗を確認する</Text>
+                            </CardBody>
+                            <CardFooter>
+                                <Button bgColor={"purple.400"}>Click</Button>
+                            </CardFooter>
+                        </Card>
                     </SimpleGrid>
                     <Card width={"60%"}>
                         <CardHeader>
@@ -61,37 +82,44 @@ const Page = () => {
 
                         <CardBody>
                             <Stack divider={<StackDivider />} spacing="4">
-                                <TransactionItem
-                                    name="Kishida"
-                                    amount={150000}
-                                />
-                                <TransactionItem
-                                    name="Biden"
-                                    amount={-150000}
-                                />
-                                <TransactionItem
-                                    name="Elon"
-                                    amount={-40000000}
-                                />
-                                <TransactionItem
-                                    name="Kudou"
-                                    amount={40000000}
-                                />
-                                <TransactionItem
-                                    name="Putin"
-                                    amount={-5000000000000000}
-                                />
+                                {transactions.slice(0, loadIndex).map((e) => (
+                                    <TransactionItem
+                                        name={e.nickname}
+                                        amount={e.amount}
+                                        key={e.transaction_id}
+                                    />
+                                ))}
                             </Stack>
                         </CardBody>
                     </Card>
                     <Spacer />
+                    <Card>
+                        <Button
+                            bgColor={"gray"}
+                            _hover={{ bg: "gray.400" }}
+                            hidden={isEmpty ? true : false}
+                            onClick={onReadMore}
+                        >
+                            さらに表示
+                        </Button>
+                    </Card>
                 </VStack>
             </BrowserView>
             <MobileView>
-                    <MobileFooter />
+                <MobileFooter />
             </MobileView>
         </>
     );
 };
 
 export default Page;
+
+export const getServerSideProps: GetServerSideProps<
+    StatusLatestTransactions
+> = async () => {
+    const transactions: Transaction[] = await fetch(
+        `${endpoint}/transactions?limit=100`
+    ).then((res) => res.json());
+
+    return { props: { transactions } };
+};
