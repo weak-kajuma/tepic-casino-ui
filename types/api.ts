@@ -25,4 +25,4 @@ export interface User {
     transaction_history?: [Transaction];
 }
 
-export const endpoint = "https://money-manager-api.takatsuki.club";
+export const endpoint = process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";

@@ -27,7 +27,7 @@ type Token = {
     exp: number;
 };
 
-const endpoint = "https://money-manager-api.takatsuki.club";
+const endpoint = process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";
 
 const Page: NextPage<StatusNickStatus> = (props) => {
     const [name, setName] = useState<string>("");

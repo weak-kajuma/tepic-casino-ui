@@ -15,6 +15,7 @@ import {
   BarElement,
 } from "chart.js"
 import { Bar } from "react-chartjs-2"
+import { endpoint } from '../../../types/api'
 
 ChartJS.register(
   CategoryScale,
@@ -87,11 +88,11 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
       }
     }
   }
-  const users: User[] = await (await fetch("https://money-manager-api.takatsuki.club/users", {headers: {"Authorization": `Bearer ${idToken}`}})).json()
+  const users: User[] = await (await fetch(`${endpoint}/users`, {headers: {"Authorization": `Bearer ${idToken}`}})).json()
   const jsonedDatas: JsonedData[] = []
   await Promise.all(users.map(async user => {
     if (user.having_money <= 3000) return
-    const tsUser: User = await (await fetch(`https://money-manager-api.takatsuki.club/users/${user.user_id}`)).json()
+    const tsUser: User = await (await fetch(`${endpoint}/users/${user.user_id}`)).json()
     tsUser.transaction_history?.forEach(transaction => {
       const roundedTimestamp = Math.floor(Date.parse(transaction.timestamp) / 3600 / 1000) * 3600 * 1000
       if (!jsonedDatas.some(data => data.time_label === roundedTimestamp)) {

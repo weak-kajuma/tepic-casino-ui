@@ -5,7 +5,6 @@ import {
     CardFooter,
     CardHeader,
     Heading,
-    Link,
     SimpleGrid,
     Text,
     VStack,
@@ -13,6 +12,8 @@ import {
 import { GetServerSideProps, NextPage } from "next";
 import { parseCookies, destroyCookie } from "nookies";
 import Router, { useRouter } from "next/router";
+import Link from 'next/link'
+import readQRCode from '../../utils/popupQrcodeReader';
 
 const Page: NextPage = () => {
     const router = useRouter();
@@ -28,13 +29,8 @@ const Page: NextPage = () => {
                         <Text>QRコードを読み込んで決済する</Text>
                     </CardBody>
                     <CardFooter>
-                        <Button
-                            bgColor={"yellow.400"}
-                            onClick={() => {
-                                window.open("/", "決済", "popup=true");
-                            }}
-                        >
-                            Click
+                        <Button bgColor={"yellow.400"}>
+                            <Link href="/admin/transactions">Click</Link>
                         </Button>
                     </CardFooter>
                 </Card>
@@ -48,7 +44,13 @@ const Page: NextPage = () => {
                         </Text>
                     </CardBody>
                     <CardFooter>
-                        <Button bgColor={"purple.400"}>Click</Button>
+                        <Button 
+                            bgColor={"purple.400"}
+                            onClick={async () => {
+                                const qrcode = await readQRCode('^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token=')
+                                router.push(qrcode)
+                            }}
+                        >Click</Button>
                     </CardFooter>
                 </Card>
                 <Card width={200}>
@@ -70,12 +72,9 @@ const Page: NextPage = () => {
                         <Text>ユーザーアカウントの作成や削除をする</Text>
                     </CardBody>
                     <CardFooter>
-                        <Button
-                            bgColor={"lightblue"}
-                            onClick={() => router.push("/admin/accounts")}
-                        >
-                            Click
-                        </Button>
+                        <Link href="/admin/accounts">
+                            <Button bgColor={"lightblue"}>Click</Button>
+                        </Link>
                     </CardFooter>
                 </Card>
                 <Card width={200}>

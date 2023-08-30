@@ -96,7 +96,7 @@ const Page: NextPage<StatusUsersProps> = (props) => {
                 <Spacer />
             </VStack>
             <Center>
-                <SimpleGrid columns={4} spacingX={"40px"} spacingY={"60px"}>
+                <SimpleGrid columns={[1, 2, 3, 4]} spacingX={"40px"} spacingY={"60px"}>
                     {users
                         .filter(
                             (e) =>

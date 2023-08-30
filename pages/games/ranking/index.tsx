@@ -17,7 +17,7 @@ import { useToast } from "@chakra-ui/toast";
 import Link from "next/link";
 import { GetServerSideProps, NextPage } from "next";
 
-const endpoint = "https://money-manager-api.takatsuki.club";
+const endpoint = process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";
 
 type StatusRankingProps = {
     users: RankingResponse[];

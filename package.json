@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
+    "dev:https": "HTTPS=true node ./server.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -34,6 +35,7 @@
     "@types/ua-parser-js": "^0.7.36",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.6",
+    "express": "^4.18.2",
     "typescript": "5.1.3"
   }
 }

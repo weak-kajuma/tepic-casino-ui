@@ -58,7 +58,7 @@ const Home = () => {
     }
     return (
     <VStack padding="20px">
-        <VStack width="80vw">
+        <VStack width="80vw" bg="white" padding="20px" borderRadius="10px">
             {!parseCookies().idToken ? (
                 <>
                     <Heading>Login</Heading>
@@ -77,7 +77,7 @@ const Home = () => {
                                 </InputRightElement>
                             </InputGroup>
                             <InputGroup>
-                                <Button marginLeft="auto" marginRight="10px" backgroundColor={"white"} onClick={handleLogin}>Login</Button>
+                                <Button marginLeft="auto" marginRight="10px" backgroundColor={"gray.100"} onClick={handleLogin}>Login</Button>
                             </InputGroup>
                         </Stack>
                     </FormControl>
