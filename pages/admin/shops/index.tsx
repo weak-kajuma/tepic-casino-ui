@@ -80,8 +80,8 @@ const Page: NextPage<StatusShopsProps> = (props) => {
                             </InputGroup>
                         </FormControl>
                         <IconButton
-                            bgColor={"#949494"}
-                            _hover={{ bg: "gray.600" }}
+                            bgColor="gray.400"
+                            _hover={{ bg: "gray.500" }}
                             size="md"
                             aria-label="Reloading"
                             icon={<RepeatClockIcon />}
@@ -102,6 +102,13 @@ const Page: NextPage<StatusShopsProps> = (props) => {
                                         toast({
                                             title: "Reloaded!",
                                             status: "success",
+                                            position: "bottom-right",
+                                        });
+                                    })
+                                    .catch(() => {
+                                        toast({
+                                            title: "Failed to reload",
+                                            status: "error",
                                             position: "bottom-right",
                                         });
                                     });

@@ -77,8 +77,8 @@ const Page: NextPage<StatusUserProps> = (props) => {
                             </InputGroup>
                         </FormControl>
                         <IconButton
-                            bgColor={"#949494"}
-                            _hover={{ bg: "gray.600" }}
+                            bgColor="gray.400"
+                            _hover={{ bg: "gray.500" }}
                             size="md"
                             aria-label="Reloading"
                             icon={<RepeatClockIcon />}
