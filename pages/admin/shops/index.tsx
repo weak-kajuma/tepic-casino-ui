@@ -192,46 +192,57 @@ const Page: NextPage<StatusShopsProps> = (props) => {
                                                         headers
                                                     )
                                                     .then(async (res) => {
-                                                        if (res.status != 200) {
-                                                            toast({
-                                                                title: "Failed to create",
-                                                                status: "error",
-                                                                position:
-                                                                    "bottom-right",
-                                                            });
-                                                        } else {
+                                                        if (res.status == 200) {
                                                             toast({
                                                                 title: "Successed to create",
                                                                 status: "success",
                                                                 position:
                                                                     "bottom-right",
                                                             });
+                                                            await axios
+                                                                .get(
+                                                                    `${endpoint}/dealers`,
+                                                                    headers
+                                                                )
+                                                                .then(
+                                                                    (
+                                                                        dealers
+                                                                    ) => {
+                                                                        if (
+                                                                            dealers.status ==
+                                                                            200
+                                                                        ) {
+                                                                            setShops(
+                                                                                dealers.data
+                                                                            );
+                                                                            toast(
+                                                                                {
+                                                                                    title: "Reloaded!",
+                                                                                    status: "success",
+                                                                                    position:
+                                                                                        "bottom-right",
+                                                                                }
+                                                                            );
+                                                                            setIsModalLoading(
+                                                                                false
+                                                                            );
+                                                                            onClose();
+                                                                        }
+                                                                    }
+                                                                );
                                                         }
-                                                        await axios
-                                                            .get(
-                                                                `${endpoint}/dealers`,
-                                                                headers
-                                                            )
-                                                            .then((dealers) => {
-                                                                if (
-                                                                    dealers.status ==
-                                                                    200
-                                                                ) {
-                                                                    setShops(
-                                                                        dealers.data
-                                                                    );
-                                                                    toast({
-                                                                        title: "Reloaded!",
-                                                                        status: "success",
-                                                                        position:
-                                                                            "bottom-right",
-                                                                    });
-                                                                    setIsModalLoading(
-                                                                        false
-                                                                    );
-                                                                    onClose();
-                                                                }
-                                                            });
+                                                    })
+                                                    .catch((e) => {
+                                                        toast({
+                                                            title: "Failed to create",
+                                                            status: "error",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                        onClose();
+                                                        setIsModalLoading(
+                                                            false
+                                                        );
                                                     });
                                             }}
                                         >
