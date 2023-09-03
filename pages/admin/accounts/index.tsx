@@ -1,48 +1,56 @@
-import { GetServerSideProps, NextPage } from "next";
-import { User, endpoint } from "../../../types/api";
+import { Search2Icon, RepeatClockIcon } from "@chakra-ui/icons";
 import {
-    Button,
-    Card,
-    CardBody,
-    CardHeader,
+    useToast,
+    VStack,
+    Spacer,
     Center,
+    HStack,
     FormControl,
-    Heading,
-    Input,
     InputGroup,
     InputLeftElement,
-    InputRightAddon,
-    SimpleGrid,
-    Spacer,
-    HStack,
-    VStack,
-    Text,
-    CardFooter,
-    AlertDialog,
-    AlertDialogOverlay,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogFooter,
-    useDisclosure,
+    Input,
     IconButton,
-    useToast,
+    SimpleGrid,
+    useDisclosure,
+    Card,
+    CardHeader,
+    Heading,
+    CardBody,
+    CardFooter,
+    Button,
+    Text,
+    Modal,
+    ModalOverlay,
+    ModalHeader,
+    ModalContent,
+    ModalBody,
+    Box,
+    FormLabel,
+    ToastId,
+    UseToastOptions,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
-import { RepeatClockIcon, Search2Icon } from "@chakra-ui/icons";
-import { parseCookies } from "nookies";
 import axios from "axios";
+import { NextPage, GetServerSideProps } from "next";
+import { parseCookies } from "nookies";
+import { useState, useRef, Dispatch, SetStateAction } from "react";
+import { Dealer, User, endpoint } from "../../../types/api";
 
-type StatusUsersProps = {
+type StatusUserProps = {
     users: User[];
     idToken: string;
 };
 
-const Page: NextPage<StatusUsersProps> = (props) => {
+const Page: NextPage<StatusUserProps> = (props) => {
     const [users, setUsers] = useState<User[]>(props.users);
+    const [amo, setAmo] = useState<number>(1);
     const [keyword, setKeyword] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    const [isModalLoading, setIsModalLoading] = useState<boolean>(false);
+
     const toast = useToast();
+
+    const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
         <>
@@ -70,7 +78,7 @@ const Page: NextPage<StatusUsersProps> = (props) => {
                         </FormControl>
                         <IconButton
                             bgColor={"#949494"}
-                            _hover={{ bg: "gray.300" }}
+                            _hover={{ bg: "gray.600" }}
                             size="md"
                             aria-label="Reloading"
                             icon={<RepeatClockIcon />}
@@ -87,6 +95,7 @@ const Page: NextPage<StatusUsersProps> = (props) => {
                                     .then((res) => {
                                         setUsers(res.data);
                                         setIsLoading(false);
+                                        console.log(users);
                                         toast({
                                             title: "Reloaded!",
                                             status: "success",
@@ -95,6 +104,118 @@ const Page: NextPage<StatusUsersProps> = (props) => {
                                     });
                             }}
                         />
+                        <Spacer />
+                        <Button
+                            colorScheme="green"
+                            _hover={{ bg: "green.600" }}
+                            size="md"
+                            aria-label="Create"
+                            onClick={onOpen}
+                        >
+                            Create
+                        </Button>
+                        <Modal isOpen={isOpen} onClose={onClose}>
+                            <ModalOverlay />
+                            <ModalContent>
+                                <ModalHeader>新しいuserを作成</ModalHeader>
+                                <ModalBody>
+                                    <VStack>
+                                        <Box w="full">
+                                            <FormLabel htmlFor="name">
+                                                Amount
+                                            </FormLabel>
+                                            <Input
+                                                id="email"
+                                                type="number"
+                                                placeholder="名無しのギャンブラー"
+                                                value={amo}
+                                                onChange={(e) =>
+                                                    setAmo(
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                            />
+                                        </Box>
+                                        <Button
+                                            background="green.400"
+                                            color="white"
+                                            _hover={{ background: "green.500" }}
+                                            isLoading={isModalLoading}
+                                            onClick={async (e) => {
+                                                setIsModalLoading(true);
+                                                const headers = {
+                                                    headers: {
+                                                        Authorization: `Bearer ${props.idToken}`,
+                                                    },
+                                                };
+                                                let err: any;
+                                                (async () => {
+                                                    for await (const _ of Array<number>(
+                                                        amo
+                                                    )) {
+                                                        await axios
+                                                            .post(
+                                                                `${endpoint}/users`,
+                                                                {},
+                                                                headers
+                                                            )
+                                                            .catch((e) => {
+                                                                err = e;
+                                                                console.log(
+                                                                    props.idToken
+                                                                );
+                                                            });
+                                                    }
+                                                })().then(async () => {
+                                                    if (err) {
+                                                        toast({
+                                                            title: "Successed to create",
+                                                            status: "error",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                    } else {
+                                                        toast({
+                                                            title: "Successed to create",
+                                                            status: "success",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                    }
+                                                    await axios
+                                                        .get(
+                                                            `${endpoint}/users`,
+                                                            headers
+                                                        )
+                                                        .then((dealers) => {
+                                                            if (
+                                                                dealers.status ==
+                                                                200
+                                                            ) {
+                                                                setUsers(
+                                                                    dealers.data
+                                                                );
+                                                                toast({
+                                                                    title: "Reloaded!",
+                                                                    status: "success",
+                                                                    position:
+                                                                        "bottom-right",
+                                                                });
+                                                                setIsModalLoading(
+                                                                    false
+                                                                );
+                                                                onClose();
+                                                            }
+                                                        });
+                                                });
+                                            }}
+                                        >
+                                            Create
+                                        </Button>
+                                    </VStack>
+                                </ModalBody>
+                            </ModalContent>
+                        </Modal>
                     </HStack>
                 </Center>
                 <Spacer />
@@ -109,27 +230,29 @@ const Page: NextPage<StatusUsersProps> = (props) => {
                     {users
                         .filter(
                             (e) =>
-                                e.nickname.includes(keyword) ||
-                                e.user_id.includes(keyword)
+                                e.nickname?.includes(keyword) ||
+                                e.user_id?.includes(keyword)
                         )
                         .map((e) => (
-                            <AccountItem
-                                name={e.nickname}
-                                amount={e.having_money}
+                            <ShopItem
                                 id={e.user_id}
-                                token={props.idToken}
+                                name={e.nickname}
                                 key={e.user_id}
+                                token={props.idToken}
+                                setUsers={setUsers}
+                                money={e.having_money}
                             />
                         ))}
                 </SimpleGrid>
             </Center>
+            <Box w="full" h={5} />
         </>
     );
 };
 
 export default Page;
 
-export const getServerSideProps: GetServerSideProps<StatusUsersProps> = async (
+export const getServerSideProps: GetServerSideProps<StatusUserProps> = async (
     ctx
 ) => {
     const idToken = parseCookies(ctx).idToken;
@@ -152,14 +275,21 @@ export const getServerSideProps: GetServerSideProps<StatusUsersProps> = async (
     return { props: { users, idToken } };
 };
 
-const AccountItem = (props: {
-    name: string;
+const ShopItem = (props: {
     id: string;
-    amount: number;
+    name: string;
     token: string;
+    money: number;
+    setUsers: Dispatch<SetStateAction<User[]>>;
 }) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const cancelRef = useRef<HTMLButtonElement>(null);
+    const [name, setName] = useState<string>(props.name);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const {
+        isOpen: isUpdateOpen,
+        onOpen: onUpdateOpen,
+        onClose: onUpdateClose,
+    } = useDisclosure();
+    const toast = useToast();
 
     return (
         <Card width={250}>
@@ -168,43 +298,109 @@ const AccountItem = (props: {
             </CardHeader>
             <CardBody>
                 <Text>{`ID: ${props.id}`}</Text>
-                <Text>{`${props.amount.toLocaleString()} DBC`}</Text>
+                <Text>{`所持金: ${props.money} DBC`}</Text>
             </CardBody>
             <CardFooter>
-                <Button bgColor={"red.400"} shadow={"md"} onClick={onOpen}>
-                    削除
-                </Button>
-                <AlertDialog
-                    isOpen={isOpen}
-                    leastDestructiveRef={cancelRef}
-                    onClose={onClose}
-                >
-                    <AlertDialogOverlay>
-                        <AlertDialogContent>
-                            <AlertDialogHeader
-                                fontSize={"lg"}
-                                fontWeight={"bold"}
-                            >
-                                Delete Account
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <Button ref={cancelRef} onClick={onClose}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    colorScheme="red"
-                                    onClick={(e) => {
-                                        onClose();
-                                        //TODO ここでユーザー削除
-                                    }}
-                                    ml={3}
-                                >
-                                    Delete
-                                </Button>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialogOverlay>
-                </AlertDialog>
+                <HStack spacing={5}>
+                    <Button
+                        bgColor={"yellow.400"}
+                        shadow={"md"}
+                        onClick={onUpdateOpen}
+                        _hover={{ bgColor: "yellow.500" }}
+                    >
+                        Update
+                    </Button>
+                    <Modal isOpen={isUpdateOpen} onClose={onUpdateClose}>
+                        <ModalOverlay />
+                        <ModalContent>
+                            <ModalHeader>Update Account</ModalHeader>
+                            <ModalBody>
+                                <VStack>
+                                    <Box w="full">
+                                        <FormLabel htmlFor="name">
+                                            Name
+                                        </FormLabel>
+                                        <Input
+                                            id="name"
+                                            type="text"
+                                            value={name}
+                                            onChange={(e) =>
+                                                setName(e.target.value)
+                                            }
+                                        />
+                                    </Box>
+                                    <Button
+                                        isLoading={isLoading}
+                                        bgColor="green.400"
+                                        color="white"
+                                        _hover={{ bgColor: "green.500" }}
+                                        onClick={async () => {
+                                            setIsLoading(true);
+                                            const headers = {
+                                                headers: {
+                                                    Authorization: `Bearer ${props.token}`,
+                                                },
+                                            };
+                                            const body = {
+                                                nickname: name,
+                                            };
+                                            await axios
+                                                .put(
+                                                    `${endpoint}/users/${props.id}/nickname`,
+                                                    body,
+                                                    headers
+                                                )
+                                                .then(async (res) => {
+                                                    if (res.status != 200) {
+                                                        toast({
+                                                            title: "Failed to update",
+                                                            status: "error",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                    } else {
+                                                        toast({
+                                                            title: "Successed to update",
+                                                            status: "success",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                    }
+                                                    await axios
+                                                        .get(
+                                                            `${endpoint}/users`,
+                                                            headers
+                                                        )
+                                                        .then((dealers) => {
+                                                            if (
+                                                                dealers.status ==
+                                                                200
+                                                            ) {
+                                                                props.setUsers(
+                                                                    dealers.data
+                                                                );
+                                                                setIsLoading(
+                                                                    false
+                                                                );
+                                                                onUpdateClose();
+                                                                toast({
+                                                                    title: "Reloaded!",
+                                                                    status: "success",
+                                                                    position:
+                                                                        "bottom-right",
+                                                                });
+                                                            }
+                                                        });
+                                                });
+                                        }}
+                                    >
+                                        Update
+                                    </Button>
+                                </VStack>
+                            </ModalBody>
+                        </ModalContent>
+                    </Modal>
+                </HStack>
             </CardFooter>
         </Card>
     );

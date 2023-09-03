@@ -18,11 +18,6 @@ import {
     CardBody,
     CardFooter,
     Button,
-    AlertDialog,
-    AlertDialogOverlay,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogFooter,
     Text,
     Modal,
     ModalOverlay,
@@ -31,13 +26,14 @@ import {
     ModalBody,
     Box,
     FormLabel,
+    ToastId,
+    UseToastOptions,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { NextPage, GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-import { useState, useRef } from "react";
-import { Dealer, User, endpoint } from "../../../types/api";
-import { getIdToken } from "firebase/auth";
+import { useState, useRef, Dispatch, SetStateAction } from "react";
+import { Dealer, endpoint } from "../../../types/api";
 
 type StatusShopsProps = {
     shops: Dealer[];
@@ -111,6 +107,7 @@ const Page: NextPage<StatusShopsProps> = (props) => {
                                     });
                             }}
                         />
+                        <Spacer />
                         <Button
                             colorScheme="green"
                             _hover={{ bg: "green.600" }}
@@ -194,22 +191,47 @@ const Page: NextPage<StatusShopsProps> = (props) => {
                                                         body,
                                                         headers
                                                     )
-                                                    .catch((e) => {
-                                                        toast({
-                                                            title: "Failed to create",
-                                                            status: "error",
-                                                            position:
-                                                                "bottom-right",
-                                                        });
-                                                    })
-                                                    .then(() => {
-                                                        toast({
-                                                            title: "Successed to create",
-                                                            status: "success",
-                                                            position:
-                                                                "bottom-right",
-                                                        });
-                                                        onClose();
+                                                    .then(async (res) => {
+                                                        if (res.status != 200) {
+                                                            toast({
+                                                                title: "Failed to create",
+                                                                status: "error",
+                                                                position:
+                                                                    "bottom-right",
+                                                            });
+                                                        } else {
+                                                            toast({
+                                                                title: "Successed to create",
+                                                                status: "success",
+                                                                position:
+                                                                    "bottom-right",
+                                                            });
+                                                        }
+                                                        await axios
+                                                            .get(
+                                                                `${endpoint}/dealers`,
+                                                                headers
+                                                            )
+                                                            .then((dealers) => {
+                                                                if (
+                                                                    dealers.status ==
+                                                                    200
+                                                                ) {
+                                                                    setShops(
+                                                                        dealers.data
+                                                                    );
+                                                                    toast({
+                                                                        title: "Reloaded!",
+                                                                        status: "success",
+                                                                        position:
+                                                                            "bottom-right",
+                                                                    });
+                                                                    setIsModalLoading(
+                                                                        false
+                                                                    );
+                                                                    onClose();
+                                                                }
+                                                            });
                                                     });
                                             }}
                                         >
@@ -245,10 +267,13 @@ const Page: NextPage<StatusShopsProps> = (props) => {
                                 description={e.description}
                                 creator={e.creator}
                                 key={e.dealer_id}
+                                token={props.idToken}
+                                setShops={setShops}
                             />
                         ))}
                 </SimpleGrid>
             </Center>
+            <Box w="full" h={5} />
         </>
     );
 };
@@ -283,9 +308,25 @@ const ShopItem = (props: {
     name: string;
     description: string;
     creator: string;
+    token: string;
+    setShops: Dispatch<SetStateAction<Dealer[]>>;
 }) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const cancelRef = useRef<HTMLButtonElement>(null);
+    const [name, setName] = useState<string>(props.name);
+    const [description, setDescription] = useState<string>(props.description);
+    const [creator, setCreator] = useState<string>(props.creator);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState<boolean>(false);
+    const {
+        isOpen: isUpdateOpen,
+        onOpen: onUpdateOpen,
+        onClose: onUpdateClose,
+    } = useDisclosure();
+    const {
+        isOpen: isDeleteOpen,
+        onOpen: onDeleteOpen,
+        onClose: onDeleteClose,
+    } = useDisclosure();
+    const toast = useToast();
 
     return (
         <Card width={300}>
@@ -299,40 +340,214 @@ const ShopItem = (props: {
                 <Text>{props.description}</Text>
             </CardBody>
             <CardFooter>
-                <Button bgColor={"red.400"} shadow={"md"} onClick={onOpen}>
-                    削除
-                </Button>
-                <AlertDialog
-                    isOpen={isOpen}
-                    leastDestructiveRef={cancelRef}
-                    onClose={onClose}
-                >
-                    <AlertDialogOverlay>
-                        <AlertDialogContent>
-                            <AlertDialogHeader
-                                fontSize={"lg"}
-                                fontWeight={"bold"}
-                            >
-                                Delete Account
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <Button ref={cancelRef} onClick={onClose}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    colorScheme="red"
-                                    onClick={(e) => {
-                                        onClose();
-                                        //TODO ここで みせ 削除
-                                    }}
-                                    ml={3}
-                                >
-                                    Delete
-                                </Button>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialogOverlay>
-                </AlertDialog>
+                <HStack spacing={5}>
+                    <Button
+                        bgColor={"yellow.400"}
+                        shadow={"md"}
+                        onClick={onUpdateOpen}
+                        _hover={{ bgColor: "yellow.500" }}
+                    >
+                        Update
+                    </Button>
+                    <Modal isOpen={isUpdateOpen} onClose={onUpdateClose}>
+                        <ModalOverlay />
+                        <ModalContent>
+                            <ModalHeader>Update Shop</ModalHeader>
+                            <ModalBody>
+                                <VStack>
+                                    <Box w="full">
+                                        <FormLabel htmlFor="name">
+                                            Name
+                                        </FormLabel>
+                                        <Input
+                                            id="name"
+                                            type="text"
+                                            value={name}
+                                            onChange={(e) =>
+                                                setName(e.target.value)
+                                            }
+                                        />
+                                    </Box>
+                                    <Box w="full">
+                                        <FormLabel htmlFor="description">
+                                            Description
+                                        </FormLabel>
+                                        <Input
+                                            id="description"
+                                            type="text"
+                                            value={description}
+                                            onChange={(e) =>
+                                                setDescription(e.target.value)
+                                            }
+                                        />
+                                    </Box>
+                                    <Box w="full">
+                                        <FormLabel htmlFor="creator">
+                                            Creator
+                                        </FormLabel>
+                                        <Input
+                                            id="creator"
+                                            type="text"
+                                            value={creator}
+                                            onChange={(e) =>
+                                                setCreator(e.target.value)
+                                            }
+                                        />
+                                    </Box>
+                                    <Button
+                                        isLoading={isLoading}
+                                        bgColor="green.400"
+                                        color="white"
+                                        _hover={{ bgColor: "green.500" }}
+                                        onClick={async () => {
+                                            setIsLoading(true);
+                                            const headers = {
+                                                headers: {
+                                                    Authorization: `Bearer ${props.token}`,
+                                                },
+                                            };
+                                            const body = {
+                                                name: name,
+                                                description: description,
+                                                creator: creator,
+                                            };
+                                            await axios
+                                                .put(
+                                                    `${endpoint}/dealers/${props.id}`,
+                                                    body,
+                                                    headers
+                                                )
+                                                .then(async (res) => {
+                                                    if (res.status != 200) {
+                                                        toast({
+                                                            title: "Failed to update",
+                                                            status: "error",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                    } else {
+                                                        toast({
+                                                            title: "Successed to update",
+                                                            status: "success",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                    }
+                                                    await axios
+                                                        .get(
+                                                            `${endpoint}/dealers`,
+                                                            headers
+                                                        )
+                                                        .then((dealers) => {
+                                                            if (
+                                                                dealers.status ==
+                                                                200
+                                                            ) {
+                                                                props.setShops(
+                                                                    dealers.data
+                                                                );
+                                                                setIsLoading(
+                                                                    false
+                                                                );
+                                                                onUpdateClose();
+                                                                toast({
+                                                                    title: "Reloaded!",
+                                                                    status: "success",
+                                                                    position:
+                                                                        "bottom-right",
+                                                                });
+                                                            }
+                                                        });
+                                                });
+                                        }}
+                                    >
+                                        Update
+                                    </Button>
+                                </VStack>
+                            </ModalBody>
+                        </ModalContent>
+                    </Modal>
+                    <Button
+                        bgColor={"red.400"}
+                        shadow={"md"}
+                        onClick={onDeleteOpen}
+                        _hover={{ bgColor: "red.500" }}
+                    >
+                        Delete
+                    </Button>
+                    <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+                        <ModalOverlay />
+                        <ModalContent>
+                            <ModalHeader>Delete Shop</ModalHeader>
+                            <ModalBody>
+                                <HStack spacing={5}>
+                                    <Button
+                                        bgColor="red.400"
+                                        _hover={{ bgColor: "red.500" }}
+                                        isLoading={isDeleteLoading}
+                                        onClick={async () => {
+                                            setIsDeleteLoading(true);
+                                            const headers = {
+                                                headers: {
+                                                    Authorization: `Bearer ${props.token}`,
+                                                },
+                                            };
+                                            await axios
+                                                .delete(
+                                                    `${endpoint}/dealers/${props.id}`,
+                                                    headers
+                                                )
+                                                .then(async () => {
+                                                    toast({
+                                                        title: "Successed to delete the shop!",
+                                                        status: "success",
+                                                        position:
+                                                            "bottom-right",
+                                                    });
+                                                    await axios
+                                                        .get(
+                                                            `${endpoint}/dealers`,
+                                                            headers
+                                                        )
+                                                        .then((res) => {
+                                                            if (
+                                                                res.status ==
+                                                                200
+                                                            ) {
+                                                                props.setShops(
+                                                                    res.data
+                                                                );
+                                                                setIsDeleteLoading(
+                                                                    false
+                                                                );
+                                                                onDeleteClose();
+                                                                toast({
+                                                                    title: "Reloaded!",
+                                                                    status: "success",
+                                                                    position:
+                                                                        "bottom-right",
+                                                                });
+                                                            }
+                                                        });
+                                                });
+                                        }}
+                                    >
+                                        Delete
+                                    </Button>
+                                    <Button
+                                        bgColor="gray.400"
+                                        _hover={{ bgColor: "gray.500" }}
+                                        onClick={() => {
+                                            onDeleteClose();
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </HStack>
+                            </ModalBody>
+                        </ModalContent>
+                    </Modal>
+                </HStack>
             </CardFooter>
         </Card>
     );
