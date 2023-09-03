@@ -14,6 +14,7 @@ import {
     InputRightAddon,
     SimpleGrid,
     Spacer,
+    HStack,
     VStack,
     Text,
     CardFooter,
@@ -48,55 +49,63 @@ const Page: NextPage<StatusUsersProps> = (props) => {
             <VStack spacing={5}>
                 <Spacer />
                 <Center>
-                    <FormControl>
-                        <InputGroup borderRadius={5}>
-                            <InputLeftElement
-                                children={<Search2Icon color={"gray.600"} />}
-                            />
-                            <Input
-                                width={"30vw"}
-                                id="keyword"
-                                type="text"
-                                placeholder="検索..."
-                                onChange={(e) => setKeyword(e.target.value)}
-                                shadow={"md"}
-                                bgColor={"white"}
-                            />
-                            <IconButton
-                                bgColor={"#949494"}
-                                _hover={{ bg: "gray.300" }}
-                                size="md"
-                                aria-label="Reloading"
-                                icon={<RepeatClockIcon />}
-                                isLoading={isLoading}
-                                onClick={async () => {
-                                    setIsLoading(true);
-                                    const headers = {
-                                        headers: {
-                                            Authorization: `Bearer ${props.idToken}`,
-                                        },
-                                    };
-                                    axios
-                                        .get(`${endpoint}/users`, headers)
-                                        .then((res) => {
-                                            setUsers(res.data);
-                                            setIsLoading(false);
-                                            toast({
-                                                title: "Reloaded!",
-                                                status: "success",
-                                                position: "bottom-right",
-                                            });
+                    <HStack spacing={5}>
+                        <FormControl>
+                            <InputGroup borderRadius={5}>
+                                <InputLeftElement
+                                    children={
+                                        <Search2Icon color={"gray.600"} />
+                                    }
+                                />
+                                <Input
+                                    width={"30vw"}
+                                    id="keyword"
+                                    type="text"
+                                    placeholder="検索..."
+                                    onChange={(e) => setKeyword(e.target.value)}
+                                    shadow={"md"}
+                                    bgColor={"white"}
+                                />
+                            </InputGroup>
+                        </FormControl>
+                        <IconButton
+                            bgColor={"#949494"}
+                            _hover={{ bg: "gray.300" }}
+                            size="md"
+                            aria-label="Reloading"
+                            icon={<RepeatClockIcon />}
+                            isLoading={isLoading}
+                            onClick={async () => {
+                                setIsLoading(true);
+                                const headers = {
+                                    headers: {
+                                        Authorization: `Bearer ${props.idToken}`,
+                                    },
+                                };
+                                axios
+                                    .get(`${endpoint}/users`, headers)
+                                    .then((res) => {
+                                        setUsers(res.data);
+                                        setIsLoading(false);
+                                        toast({
+                                            title: "Reloaded!",
+                                            status: "success",
+                                            position: "bottom-right",
                                         });
-                                }}
-                            />
-                        </InputGroup>
-                    </FormControl>
+                                    });
+                            }}
+                        />
+                    </HStack>
                 </Center>
                 <Spacer />
                 <Spacer />
             </VStack>
             <Center>
-                <SimpleGrid columns={[1, 2, 3, 4]} spacingX={"40px"} spacingY={"60px"}>
+                <SimpleGrid
+                    columns={[1, 2, 3, 4]}
+                    spacingX={"40px"}
+                    spacingY={"60px"}
+                >
                     {users
                         .filter(
                             (e) =>

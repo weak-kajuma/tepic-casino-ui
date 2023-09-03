@@ -12,8 +12,8 @@ import {
 import { GetServerSideProps, NextPage } from "next";
 import { parseCookies, destroyCookie } from "nookies";
 import Router, { useRouter } from "next/router";
-import Link from 'next/link'
-import readQRCode from '../../utils/popupQrcodeReader';
+import Link from "next/link";
+import readQRCode from "../../utils/popupQrcodeReader";
 
 const Page: NextPage = () => {
     const router = useRouter();
@@ -44,13 +44,17 @@ const Page: NextPage = () => {
                         </Text>
                     </CardBody>
                     <CardFooter>
-                        <Button 
+                        <Button
                             bgColor={"purple.400"}
                             onClick={async () => {
-                                const qrcode = await readQRCode('^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token=')
-                                router.push(qrcode)
+                                const qrcode = await readQRCode(
+                                    "^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token="
+                                );
+                                router.push(qrcode);
                             }}
-                        >Click</Button>
+                        >
+                            Click
+                        </Button>
                     </CardFooter>
                 </Card>
                 <Card width={200}>
@@ -61,7 +65,9 @@ const Page: NextPage = () => {
                         <Text>店舗の追加や削除をする</Text>
                     </CardBody>
                     <CardFooter>
-                        <Button bgColor={"lightgreen"}>Click</Button>
+                        <Link href="/admin/shops">
+                            <Button bgColor={"lightgreen"}>Click</Button>
+                        </Link>
                     </CardFooter>
                 </Card>
                 <Card width={200}>
