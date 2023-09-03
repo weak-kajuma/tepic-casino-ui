@@ -232,7 +232,7 @@ const Page: NextPage<StatusShopsProps> = (props) => {
                                                                 );
                                                         }
                                                     })
-                                                    .catch((e) => {
+                                                    .catch(() => {
                                                         toast({
                                                             title: "Failed to create",
                                                             status: "error",
@@ -469,6 +469,16 @@ const ShopItem = (props: {
                                                                 });
                                                             }
                                                         });
+                                                })
+                                                .catch(() => {
+                                                    toast({
+                                                        title: "Failed to update",
+                                                        status: "error",
+                                                        position:
+                                                            "bottom-right",
+                                                    });
+                                                    onUpdateClose();
+                                                    setIsLoading(false);
                                                 });
                                         }}
                                     >
@@ -540,6 +550,16 @@ const ShopItem = (props: {
                                                                 });
                                                             }
                                                         });
+                                                })
+                                                .catch(() => {
+                                                    toast({
+                                                        title: "Failed to delete",
+                                                        status: "error",
+                                                        position:
+                                                            "bottom-right",
+                                                    });
+                                                    onDeleteClose();
+                                                    setIsDeleteLoading(false);
                                                 });
                                         }}
                                     >
