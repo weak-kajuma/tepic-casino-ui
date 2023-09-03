@@ -161,9 +161,6 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                                             )
                                                             .catch((e) => {
                                                                 err = e;
-                                                                console.log(
-                                                                    props.idToken
-                                                                );
                                                             });
                                                     }
                                                 })().then(async () => {
@@ -238,7 +235,7 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                 id={e.user_id}
                                 name={e.nickname}
                                 key={e.user_id}
-                                token={props.idToken}
+                                idToken={props.idToken}
                                 setUsers={setUsers}
                                 money={e.having_money}
                             />
@@ -278,7 +275,7 @@ export const getServerSideProps: GetServerSideProps<StatusUserProps> = async (
 const ShopItem = (props: {
     id: string;
     name: string;
-    token: string;
+    idToken: string;
     money: number;
     setUsers: Dispatch<SetStateAction<User[]>>;
 }) => {
@@ -338,16 +335,13 @@ const ShopItem = (props: {
                                             setIsLoading(true);
                                             const headers = {
                                                 headers: {
-                                                    Authorization: `Bearer ${props.token}`,
+                                                    Authorization: `Bearer ${props.idToken}`,
                                                 },
-                                            };
-                                            const body = {
-                                                nickname: name,
                                             };
                                             await axios
                                                 .put(
-                                                    `${endpoint}/users/${props.id}/nickname`,
-                                                    body,
+                                                    `${endpoint}/users/${props.id}/nickname?nickname=${name}`,
+                                                    {},
                                                     headers
                                                 )
                                                 .then(async (res) => {
