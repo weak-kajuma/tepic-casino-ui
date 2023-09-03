@@ -280,11 +280,17 @@ const ShopItem = (props: {
     setUsers: Dispatch<SetStateAction<User[]>>;
 }) => {
     const [name, setName] = useState<string>(props.name);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isUpdateLoading, setIsUpdateLoading] = useState<boolean>(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState<boolean>(false);
     const {
         isOpen: isUpdateOpen,
         onOpen: onUpdateOpen,
         onClose: onUpdateClose,
+    } = useDisclosure();
+    const {
+        isOpen: isDeleteOpen,
+        onOpen: onDeleteOpen,
+        onClose: onDeleteClose,
     } = useDisclosure();
     const toast = useToast();
 
@@ -326,71 +332,165 @@ const ShopItem = (props: {
                                             }
                                         />
                                     </Box>
+                                    <HStack>
+                                        <Button
+                                            isLoading={isUpdateLoading}
+                                            bgColor="green.400"
+                                            color="white"
+                                            _hover={{ bgColor: "green.500" }}
+                                            onClick={async () => {
+                                                setIsUpdateLoading(true);
+                                                const headers = {
+                                                    headers: {
+                                                        Authorization: `Bearer ${props.idToken}`,
+                                                    },
+                                                };
+                                                await axios
+                                                    .put(
+                                                        `${endpoint}/users/${props.id}/nickname?nickname=${name}`,
+                                                        {},
+                                                        headers
+                                                    )
+                                                    .then(async (res) => {
+                                                        if (res.status != 200) {
+                                                            toast({
+                                                                title: "Failed to update",
+                                                                status: "error",
+                                                                position:
+                                                                    "bottom-right",
+                                                            });
+                                                        } else {
+                                                            toast({
+                                                                title: "Successed to update",
+                                                                status: "success",
+                                                                position:
+                                                                    "bottom-right",
+                                                            });
+                                                        }
+                                                        await axios
+                                                            .get(
+                                                                `${endpoint}/users`,
+                                                                headers
+                                                            )
+                                                            .then((users) => {
+                                                                if (
+                                                                    users.status ==
+                                                                    200
+                                                                ) {
+                                                                    props.setUsers(
+                                                                        users.data
+                                                                    );
+                                                                    setIsUpdateLoading(
+                                                                        false
+                                                                    );
+                                                                    onUpdateClose();
+                                                                    toast({
+                                                                        title: "Reloaded!",
+                                                                        status: "success",
+                                                                        position:
+                                                                            "bottom-right",
+                                                                    });
+                                                                }
+                                                            });
+                                                    });
+                                            }}
+                                        >
+                                            Update
+                                        </Button>
+                                        <Button
+                                            bgColor="gray.400"
+                                            _hover={{ bgColor: "gray.500" }}
+                                            onClick={onUpdateClose}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </HStack>
+                                </VStack>
+                            </ModalBody>
+                        </ModalContent>
+                    </Modal>
+                    <Button
+                        bgColor="red.400"
+                        _hover={{ bgColor: "red.500" }}
+                        onClick={onDeleteOpen}
+                    >
+                        Delete
+                    </Button>
+                    <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+                        <ModalOverlay />
+                        <ModalContent>
+                            <ModalHeader>Delete Account</ModalHeader>
+                            <ModalBody>
+                                <HStack>
                                     <Button
-                                        isLoading={isLoading}
-                                        bgColor="green.400"
-                                        color="white"
-                                        _hover={{ bgColor: "green.500" }}
+                                        bgColor="red.400"
+                                        _hover={{ bgColor: "red.500" }}
+                                        isLoading={isDeleteLoading}
                                         onClick={async () => {
-                                            setIsLoading(true);
                                             const headers = {
                                                 headers: {
                                                     Authorization: `Bearer ${props.idToken}`,
                                                 },
                                             };
+                                            setIsDeleteLoading(true);
                                             await axios
-                                                .put(
-                                                    `${endpoint}/users/${props.id}/nickname?nickname=${name}`,
-                                                    {},
+                                                .delete(
+                                                    `${endpoint}/users/${props.id}`,
                                                     headers
                                                 )
                                                 .then(async (res) => {
-                                                    if (res.status != 200) {
+                                                    console.log(res);
+                                                    if (res.status == 204) {
                                                         toast({
-                                                            title: "Failed to update",
-                                                            status: "error",
-                                                            position:
-                                                                "bottom-right",
-                                                        });
-                                                    } else {
-                                                        toast({
-                                                            title: "Successed to update",
+                                                            title: "Successed to delete!",
                                                             status: "success",
                                                             position:
                                                                 "bottom-right",
                                                         });
-                                                    }
-                                                    await axios
-                                                        .get(
-                                                            `${endpoint}/users`,
-                                                            headers
-                                                        )
-                                                        .then((dealers) => {
-                                                            if (
-                                                                dealers.status ==
-                                                                200
-                                                            ) {
-                                                                props.setUsers(
-                                                                    dealers.data
-                                                                );
-                                                                setIsLoading(
-                                                                    false
-                                                                );
-                                                                onUpdateClose();
-                                                                toast({
-                                                                    title: "Reloaded!",
-                                                                    status: "success",
-                                                                    position:
-                                                                        "bottom-right",
-                                                                });
-                                                            }
+                                                        await axios
+                                                            .get(
+                                                                `${endpoint}/users`,
+                                                                headers
+                                                            )
+                                                            .then((users) => {
+                                                                if (
+                                                                    users.status ==
+                                                                    200
+                                                                ) {
+                                                                    props.setUsers(
+                                                                        users.data
+                                                                    );
+                                                                    toast({
+                                                                        title: "Reloaded!",
+                                                                        status: "success",
+                                                                        position:
+                                                                            "bottom-right",
+                                                                    });
+                                                                }
+                                                            });
+                                                    } else {
+                                                        toast({
+                                                            title: "Failed to delete!",
+                                                            status: "error",
+                                                            position:
+                                                                "bottom-right",
                                                         });
+                                                    }
+                                                    setIsDeleteLoading(false);
+                                                    onDeleteClose();
                                                 });
                                         }}
                                     >
-                                        Update
+                                        Delete
                                     </Button>
-                                </VStack>
+                                    <Button
+                                        bgColor="gray.400"
+                                        _hover={{ bgColor: "gray.500" }}
+                                        onClick={onDeleteClose}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </HStack>
                             </ModalBody>
                         </ModalContent>
                     </Modal>
