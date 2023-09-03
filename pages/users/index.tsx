@@ -20,7 +20,6 @@ import {
     position,
     SimpleGrid,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { useState } from "react";
 import { TransactionItem } from "../../components/TransactionItem";
 import { BrowserView } from "react-device-detect";
