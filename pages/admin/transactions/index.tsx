@@ -1,15 +1,16 @@
-import { FormControl, Stack, InputGroup, Input, InputRightAddon, InputRightElement, Button, Select, VStack, Heading, Spacer, RadioGroup, Radio, HStack, NumberInput, NumberInputField, NumberDecrementStepper, NumberIncrementStepper, NumberInputStepper, Flex, Slider, SliderFilledTrack, SliderThumb, SliderTrack, InputLeftAddon } from "@chakra-ui/react"
+import { FormControl, Stack, InputGroup, Input, InputRightAddon, InputRightElement, Button, Select, VStack, Heading, Spacer, RadioGroup, Radio, HStack, NumberInput, NumberInputField, NumberDecrementStepper, NumberIncrementStepper, NumberInputStepper, Flex, Slider, SliderFilledTrack, SliderThumb, SliderTrack, InputLeftAddon, useToast } from "@chakra-ui/react"
 import { GetServerSideProps, NextPage } from "next"
-import { parseCookies, setCookie } from "nookies"
+import { parseCookies } from "nookies"
 import { Dealer, endpoint } from "../../../types/api"
 import axios from "axios"
 import { useState } from "react"
 import readQRCode from '../../../utils/popupQrcodeReader';
 
 const Page: NextPage<{dealers: Dealer[]}> = ({dealers}) => {
+    const toast = useToast()
     const [dealerId, setDealerId] = useState("")
     const [tsType, setTsType] = useState<"bet" | "payout" | "payment" | "gift" | "other">("bet")
-    const [amount, setAmount] = useState(0)
+    const [amount, setAmount] = useState(100)
     const [detail, setDetail] = useState(`${tsType.toUpperCase()}-${dealers.filter(j => j.dealer_id === dealerId)[0]?.name}`)
 
     return (
@@ -57,13 +58,20 @@ const Page: NextPage<{dealers: Dealer[]}> = ({dealers}) => {
                     <Button marginLeft="auto" marginRight="10px" backgroundColor={"gray.100"} onClick={async () => {
                         const user_id = await readQRCode('^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token=')
                         await axios.post(`${endpoint}/transactions`, {
-                            user_id,
+                            user_id: user_id.slice(39,43),
                             dealer_id: dealerId,
                             amount,
                             type: tsType,
                             detail,
-                            hide_detail: ""
+                            hide_detail: "nothing"
                         }, {headers: {Authorization: `Bearer ${parseCookies().idToken}`}})
+                        toast({
+                            title: "Transaction created",
+                            description: "決済が完了しました。",
+                            status: "success",
+                            duration: 5000,
+                            isClosable: true
+                        })
                     }}>Read QR</Button>
                 </InputGroup>
             </VStack>
