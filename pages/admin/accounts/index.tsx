@@ -392,6 +392,19 @@ const ShopItem = (props: {
                                                                     });
                                                                 }
                                                             });
+                                                    })
+                                                    .catch((e) => {
+                                                        console.log(e);
+                                                        toast({
+                                                            title: "Failed to update",
+                                                            status: "error",
+                                                            position:
+                                                                "bottom-right",
+                                                        });
+                                                        onUpdateClose();
+                                                        setIsUpdateLoading(
+                                                            false
+                                                        );
                                                     });
                                             }}
                                         >
