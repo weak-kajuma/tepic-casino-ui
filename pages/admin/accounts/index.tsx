@@ -336,7 +336,6 @@ const ShopItem = (props: {
                                         <Button
                                             isLoading={isUpdateLoading}
                                             bgColor="green.400"
-                                            color="white"
                                             _hover={{ bgColor: "green.500" }}
                                             onClick={async () => {
                                                 setIsUpdateLoading(true);
