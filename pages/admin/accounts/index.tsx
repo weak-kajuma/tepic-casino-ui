@@ -231,7 +231,7 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                 e.user_id?.includes(keyword)
                         )
                         .map((e) => (
-                            <ShopItem
+                            <AccountItem
                                 id={e.user_id}
                                 name={e.nickname}
                                 key={e.user_id}
@@ -272,7 +272,7 @@ export const getServerSideProps: GetServerSideProps<StatusUserProps> = async (
     return { props: { users, idToken } };
 };
 
-const ShopItem = (props: {
+const AccountItem = (props: {
     id: string;
     name: string;
     idToken: string;
