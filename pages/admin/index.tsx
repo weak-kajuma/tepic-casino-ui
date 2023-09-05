@@ -29,7 +29,10 @@ const Page: NextPage = () => {
                         <Text>QRコードを読み込んで決済する</Text>
                     </CardBody>
                     <CardFooter>
-                        <Button bgColor={"yellow.400"}>
+                        <Button
+                            bgColor={"yellow.400"}
+                            _hover={{ bgColor: "yellow.500" }}
+                        >
                             <Link href="/admin/transactions">Click</Link>
                         </Button>
                     </CardFooter>
@@ -46,6 +49,7 @@ const Page: NextPage = () => {
                     <CardFooter>
                         <Button
                             bgColor={"purple.400"}
+                            _hover={{ bgColor: "purple.500" }}
                             onClick={async () => {
                                 const qrcode = await readQRCode(
                                     "^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token="
@@ -66,7 +70,12 @@ const Page: NextPage = () => {
                     </CardBody>
                     <CardFooter>
                         <Link href="/admin/shops">
-                            <Button bgColor={"lightgreen"}>Click</Button>
+                            <Button
+                                bgColor={"cyan.400"}
+                                _hover={{ bgColor: "cyan.500" }}
+                            >
+                                Click
+                            </Button>
                         </Link>
                     </CardFooter>
                 </Card>
@@ -79,7 +88,12 @@ const Page: NextPage = () => {
                     </CardBody>
                     <CardFooter>
                         <Link href="/admin/accounts">
-                            <Button bgColor={"lightblue"}>Click</Button>
+                            <Button
+                                bgColor={"teal.400"}
+                                _hover={{ bgColor: "teal.500" }}
+                            >
+                                Click
+                            </Button>
                         </Link>
                     </CardFooter>
                 </Card>
@@ -91,7 +105,12 @@ const Page: NextPage = () => {
                         <Text>サーバーの負荷状況や運営の損失を確認する</Text>
                     </CardBody>
                     <CardFooter>
-                        <Button bgColor={"blue.500"}>Click</Button>
+                        <Button
+                            bgColor={"blue.400"}
+                            _hover={{ bgColor: "blue.500" }}
+                        >
+                            Click
+                        </Button>
                     </CardFooter>
                 </Card>
                 <Card width={200}>
@@ -104,6 +123,7 @@ const Page: NextPage = () => {
                     <CardFooter>
                         <Button
                             bgColor={"red.400"}
+                            _hover={{ bgColor: "red.500" }}
                             onClick={() => {
                                 destroyCookie(null, "idToken");
                                 Router.push("/admin/login");
