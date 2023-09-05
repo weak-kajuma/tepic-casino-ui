@@ -40,6 +40,13 @@ type StatusUserProps = {
     idToken: string;
 };
 
+type UserRes = {
+    user_id: string;
+    nickname: string;
+    having_money: number;
+    token: string;
+};
+
 const Page: NextPage<StatusUserProps> = (props) => {
     const [users, setUsers] = useState<User[]>(props.users);
     const [amo, setAmo] = useState<number>(1);
@@ -159,6 +166,13 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                                                 {},
                                                                 headers
                                                             )
+                                                            .then((res) => {
+                                                                const data: UserRes =
+                                                                    res.data;
+                                                                console.log(
+                                                                    data.token
+                                                                );
+                                                            })
                                                             .catch((e) => {
                                                                 err = e;
                                                             });

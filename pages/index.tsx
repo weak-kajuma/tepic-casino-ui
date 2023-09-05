@@ -58,6 +58,7 @@ const Page: NextPage<StatusLatestTransactions> = (props) => {
                         <CardFooter>
                             <Button
                                 bgColor={"blue.400"}
+                                _hover={{ bgColor: "blue.500" }}
                                 onClick={async () => {
                                     const qrcode = await readQRCode(
                                         "^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token="
@@ -80,7 +81,12 @@ const Page: NextPage<StatusLatestTransactions> = (props) => {
                         </CardBody>
                         <CardFooter>
                             <Link as={NextLink} href="/games/ranking">
-                                <Button bgColor={"yellow.400"}>Click</Button>
+                                <Button
+                                    bgColor={"yellow.400"}
+                                    _hover={{ bgColor: "yellow.500" }}
+                                >
+                                    Click
+                                </Button>
                             </Link>
                         </CardFooter>
                     </Card>
@@ -92,7 +98,14 @@ const Page: NextPage<StatusLatestTransactions> = (props) => {
                             <Text>遊べる全ての店舗を確認する</Text>
                         </CardBody>
                         <CardFooter>
-                            <Button bgColor={"purple.400"}>Click</Button>
+                            <Link as={NextLink} href="/shops">
+                                <Button
+                                    bgColor={"purple.400"}
+                                    _hover={{ bgColor: "purple.500" }}
+                                >
+                                    Click
+                                </Button>
+                            </Link>
                         </CardFooter>
                     </Card>
                 </SimpleGrid>

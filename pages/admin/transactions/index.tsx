@@ -56,7 +56,16 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                             <Select
                                 placeholder="Select Shop"
                                 bgColor="white"
-                                onChange={(e) => setDealerId(e.target.value)}
+                                onChange={(e) => {
+                                    setDealerId(e.target.value);
+                                    setDetail(
+                                        `${tsType.toUpperCase()}-${
+                                            dealers.filter(
+                                                (j) => j.dealer_id === dealerId
+                                            )[0]?.name
+                                        }`
+                                    );
+                                }}
                             >
                                 {dealers.map((dealer) => (
                                     <option
@@ -77,7 +86,16 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                                         | "payment"
                                         | "gift"
                                         | "other"
-                                ) => setTsType(e)}
+                                ) => {
+                                    setTsType(e);
+                                    setDetail(
+                                        `${tsType.toUpperCase()}-${
+                                            dealers.filter(
+                                                (j) => j.dealer_id === dealerId
+                                            )[0]?.name
+                                        }`
+                                    );
+                                }}
                             >
                                 <Stack direction="row">
                                     <Radio value="bet" size="lg">
@@ -101,7 +119,16 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                                 defaultValue={100}
                                 min={100}
                                 allowMouseWheel
-                                onChange={(e) => setAmount(parseInt(e))}
+                                onChange={(e) => {
+                                    setAmount(parseInt(e));
+                                    setDetail(
+                                        `${tsType.toUpperCase()}-${
+                                            dealers.filter(
+                                                (j) => j.dealer_id === dealerId
+                                            )[0]?.name
+                                        }`
+                                    );
+                                }}
                             >
                                 <NumberInputField />
                                 <NumberInputStepper>
@@ -119,6 +146,7 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                                         (j) => j.dealer_id === dealerId
                                     )[0]?.name
                                 }`}
+                                value={detail}
                                 onChange={(e) => setDetail(e.target.value)}
                             />
                         </InputGroup>
