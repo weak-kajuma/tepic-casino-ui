@@ -25,5 +25,12 @@ export interface User {
     transaction_history?: [Transaction];
 }
 
+export interface CreateUserResponse {
+    user_id: string;
+    nickname: string;
+    having_money: number;
+    token: string;
+}
+
 export const endpoint =
     process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";

@@ -115,9 +115,9 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                             <InputLeftAddon children="Details" />
                             <Input
                                 defaultValue={`${tsType.toUpperCase()}-${
-                                    dealers.filter(
+                                    dealers.find(
                                         (j) => j.dealer_id === dealerId
-                                    )[0]?.name
+                                    )?.name
                                 }`}
                                 onChange={(e) => setDetail(e.target.value)}
                             />
