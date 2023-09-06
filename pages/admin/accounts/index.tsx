@@ -341,6 +341,7 @@ const ShopItem = (props: {
                                             id="name"
                                             type="text"
                                             value={name}
+                                            maxLength={10}
                                             onChange={(e) =>
                                                 setName(e.target.value)
                                             }
