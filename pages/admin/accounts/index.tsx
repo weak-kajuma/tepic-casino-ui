@@ -1,3 +1,4 @@
+'use client'
 import { Search2Icon, RepeatClockIcon } from "@chakra-ui/icons";
 import {
     useToast,
@@ -25,15 +26,15 @@ import {
     ModalContent,
     ModalBody,
     Box,
-    FormLabel,
-    ToastId,
-    UseToastOptions,
+    FormLabel
 } from "@chakra-ui/react";
 import axios from "axios";
 import { NextPage, GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { useState, useRef, Dispatch, SetStateAction } from "react";
-import { Dealer, User, endpoint } from "../../../types/api";
+import { CreateUserResponse, Dealer, User, endpoint } from "../../../types/api";
+import Router from "next/router";
+
 
 type StatusUserProps = {
     users: User[];
@@ -102,7 +103,6 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                     .then((res) => {
                                         setUsers(res.data);
                                         setIsLoading(false);
-                                        console.log(users);
                                         toast({
                                             title: "Reloaded!",
                                             status: "success",
@@ -148,77 +148,57 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                             color="white"
                                             _hover={{ background: "green.500" }}
                                             isLoading={isModalLoading}
-                                            onClick={async (e) => {
+                                            onClick={() => {
                                                 setIsModalLoading(true);
                                                 const headers = {
                                                     headers: {
                                                         Authorization: `Bearer ${props.idToken}`,
                                                     },
                                                 };
-                                                let err: any;
-                                                (async () => {
-                                                    for await (const _ of Array<number>(
-                                                        amo
-                                                    )) {
-                                                        await axios
-                                                            .post(
-                                                                `${endpoint}/users`,
-                                                                {},
-                                                                headers
-                                                            )
-                                                            .then((res) => {
-                                                                const data: UserRes =
-                                                                    res.data;
-                                                                console.log(
-                                                                    data.token
-                                                                );
-                                                            })
-                                                            .catch((e) => {
-                                                                err = e;
-                                                            });
-                                                    }
-                                                })().then(async () => {
-                                                    if (err) {
-                                                        toast({
-                                                            title: "Successed to create",
-                                                            status: "error",
-                                                            position:
-                                                                "bottom-right",
-                                                        });
-                                                    } else {
-                                                        toast({
-                                                            title: "Successed to create",
+
+                                                const array: number[] = []
+                                                for (let i = 0;i < amo;i++) array.push(i)
+                                                Promise.all(array.map(async () => {
+                                                    fetch(`${endpoint}/users`, {method: "POST",headers: {Authorization: `Bearer ${props.idToken}`}})
+                                                    .then(res => res.json())
+                                                    .then((user: CreateUserResponse) => Router.push(encodeURI(`/admin/accounts/qrcode/?id=${user.user_id}&token=${user.token}`)))
+                                                }))
+                                                .then(async () => {
+                                                    toast({title: "Successed to create",
                                                             status: "success",
                                                             position:
                                                                 "bottom-right",
-                                                        });
-                                                    }
-                                                    await axios
-                                                        .get(
+                                                    });
+                                                    axios.get(
                                                             `${endpoint}/users`,
                                                             headers
-                                                        )
-                                                        .then((dealers) => {
-                                                            if (
-                                                                dealers.status ==
-                                                                200
-                                                            ) {
-                                                                setUsers(
-                                                                    dealers.data
-                                                                );
-                                                                toast({
-                                                                    title: "Reloaded!",
-                                                                    status: "success",
-                                                                    position:
-                                                                        "bottom-right",
-                                                                });
-                                                                setIsModalLoading(
-                                                                    false
-                                                                );
-                                                                onClose();
-                                                            }
-                                                        });
-                                                });
+                                                    ).then((dealers) => {
+                                                        if (
+                                                            dealers.status ==
+                                                            200
+                                                        ) {
+                                                            setUsers(
+                                                                dealers.data
+                                                            );
+                                                            toast({
+                                                                title: "Reloaded!",
+                                                                status: "success",
+                                                                position:
+                                                                    "bottom-right",
+                                                            });
+                                                            setIsModalLoading(
+                                                                false
+                                                            );
+                                                            onClose();
+                                                        }
+                                                    });
+                                                }).catch(e => toast({
+                                                    title: "Failed to create",
+                                                    status: "error",
+                                                    description: e,
+                                                    position:
+                                                        "bottom-right",
+                                                }))
                                             }}
                                         >
                                             Create
@@ -245,7 +225,7 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                 e.user_id?.includes(keyword)
                         )
                         .map((e) => (
-                            <ShopItem
+                            <AccountItem
                                 id={e.user_id}
                                 name={e.nickname}
                                 key={e.user_id}
@@ -286,7 +266,7 @@ export const getServerSideProps: GetServerSideProps<StatusUserProps> = async (
     return { props: { users, idToken } };
 };
 
-const ShopItem = (props: {
+const AccountItem = (props: {
     id: string;
     name: string;
     idToken: string;
@@ -382,30 +362,30 @@ const ShopItem = (props: {
                                                             });
                                                         }
                                                         await axios
-                                                            .get(
-                                                                `${endpoint}/users`,
-                                                                headers
-                                                            )
-                                                            .then((users) => {
-                                                                if (
-                                                                    users.status ==
-                                                                    200
-                                                                ) {
-                                                                    props.setUsers(
-                                                                        users.data
-                                                                    );
-                                                                    setIsUpdateLoading(
-                                                                        false
-                                                                    );
-                                                                    onUpdateClose();
-                                                                    toast({
-                                                                        title: "Reloaded!",
-                                                                        status: "success",
-                                                                        position:
-                                                                            "bottom-right",
-                                                                    });
-                                                                }
-                                                            });
+                                                        .get(
+                                                            `${endpoint}/users`,
+                                                            headers
+                                                        )
+                                                        .then((users) => {
+                                                            if (
+                                                                users.status ==
+                                                                200
+                                                            ) {
+                                                                props.setUsers(
+                                                                    users.data
+                                                                );
+                                                                setIsUpdateLoading(
+                                                                    false
+                                                                );
+                                                                onUpdateClose();
+                                                                toast({
+                                                                    title: "Reloaded!",
+                                                                    status: "success",
+                                                                    position:
+                                                                        "bottom-right",
+                                                                });
+                                                            }
+                                                        });
                                                     })
                                                     .catch((e) => {
                                                         console.log(e);
@@ -416,13 +396,10 @@ const ShopItem = (props: {
                                                                 "bottom-right",
                                                         });
                                                         onUpdateClose();
-                                                        setIsUpdateLoading(
-                                                            false
-                                                        );
+                                                        setIsUpdateLoading(false);
                                                     });
                                             }}
-                                        >
-                                            Update
+                                        >Update
                                         </Button>
                                         <Button
                                             bgColor="gray.400"
@@ -466,7 +443,6 @@ const ShopItem = (props: {
                                                     headers
                                                 )
                                                 .then(async (res) => {
-                                                    console.log(res);
                                                     if (res.status == 204) {
                                                         toast({
                                                             title: "Successed to delete!",
