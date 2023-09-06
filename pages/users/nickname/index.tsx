@@ -27,7 +27,8 @@ type Token = {
     exp: number;
 };
 
-const endpoint = process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";
+const endpoint =
+    process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";
 
 const Page: NextPage<StatusNickStatus> = (props) => {
     const [name, setName] = useState<string>("");
@@ -56,7 +57,8 @@ const Page: NextPage<StatusNickStatus> = (props) => {
                                 w={"4rem"}
                                 h={"2.25rem"}
                                 color={"white"}
-                                backgroundColor={"green.400"}
+                                bgColor={"green.400"}
+                                _hover={{ bgColor: "green.500" }}
                                 onClick={async (e) => {
                                     try {
                                         if (!props.secure) throw new Error();

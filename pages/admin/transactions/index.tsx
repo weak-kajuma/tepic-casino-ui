@@ -30,7 +30,7 @@ import { GetServerSideProps, NextPage } from "next";
 import { parseCookies } from "nookies";
 import { Dealer, endpoint } from "../../../types/api";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import readQRCode from "../../../utils/popupQrcodeReader";
 
 const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
@@ -40,11 +40,15 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
         "bet" | "payout" | "payment" | "gift" | "other"
     >("bet");
     const [amount, setAmount] = useState(100);
-    const [detail, setDetail] = useState(
-        `${tsType.toUpperCase()}-${
-            dealers.filter((j) => j.dealer_id === dealerId)[0]?.name
-        }`
-    );
+    const [detail, setDetail] = useState("");
+
+    useEffect(() => {
+        setDetail(
+            `${tsType.toUpperCase()}-${
+                dealers.filter((j) => j.dealer_id === dealerId)[0]?.name
+            }`
+        );
+    }, [tsType, amount, dealerId]);
 
     return (
         <VStack padding="20px">
@@ -56,7 +60,9 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                             <Select
                                 placeholder="Select Shop"
                                 bgColor="white"
-                                onChange={(e) => setDealerId(e.target.value)}
+                                onChange={(e) => {
+                                    setDealerId(e.target.value);
+                                }}
                             >
                                 {dealers.map((dealer) => (
                                     <option
@@ -77,7 +83,9 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                                         | "payment"
                                         | "gift"
                                         | "other"
-                                ) => setTsType(e)}
+                                ) => {
+                                    setTsType(e);
+                                }}
                             >
                                 <Stack direction="row">
                                     <Radio value="bet" size="lg">
@@ -101,7 +109,9 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                                 defaultValue={100}
                                 min={100}
                                 allowMouseWheel
-                                onChange={(e) => setAmount(parseInt(e))}
+                                onChange={(e) => {
+                                    setAmount(parseInt(e));
+                                }}
                             >
                                 <NumberInputField />
                                 <NumberInputStepper>
@@ -114,11 +124,7 @@ const Page: NextPage<{ dealers: Dealer[] }> = ({ dealers }) => {
                         <InputGroup size="lg">
                             <InputLeftAddon children="Details" />
                             <Input
-                                defaultValue={`${tsType.toUpperCase()}-${
-                                    dealers.find(
-                                        (j) => j.dealer_id === dealerId
-                                    )?.name
-                                }`}
+                                value={detail}
                                 onChange={(e) => setDetail(e.target.value)}
                             />
                         </InputGroup>

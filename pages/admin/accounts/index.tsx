@@ -41,6 +41,13 @@ type StatusUserProps = {
     idToken: string;
 };
 
+type UserRes = {
+    user_id: string;
+    nickname: string;
+    having_money: number;
+    token: string;
+};
+
 const Page: NextPage<StatusUserProps> = (props) => {
     const [users, setUsers] = useState<User[]>(props.users);
     const [amo, setAmo] = useState<number>(1);
@@ -157,8 +164,7 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                                     .then((user: CreateUserResponse) => Router.push(encodeURI(`/admin/accounts/qrcode/?id=${user.user_id}&token=${user.token}`)))
                                                 }))
                                                 .then(async () => {
-                                                    toast({
-                                                            title: "Successed to create",
+                                                    toast({title: "Successed to create",
                                                             status: "success",
                                                             position:
                                                                 "bottom-right",
@@ -315,6 +321,7 @@ const AccountItem = (props: {
                                             id="name"
                                             type="text"
                                             value={name}
+                                            maxLength={10}
                                             onChange={(e) =>
                                                 setName(e.target.value)
                                             }
@@ -324,7 +331,6 @@ const AccountItem = (props: {
                                         <Button
                                             isLoading={isUpdateLoading}
                                             bgColor="green.400"
-                                            color="white"
                                             _hover={{ bgColor: "green.500" }}
                                             onClick={async () => {
                                                 setIsUpdateLoading(true);
