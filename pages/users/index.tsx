@@ -181,6 +181,7 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                                     )
                                                 ] * transaction.amount
                                             }
+                                            type={transaction.type}
                                             key={transaction.transaction_id}
                                         />
                                     )

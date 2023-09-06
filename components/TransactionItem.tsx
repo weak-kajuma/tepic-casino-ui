@@ -1,13 +1,16 @@
 import { Box, Heading, Text } from "@chakra-ui/react";
 
-export const TransactionItem = (props: { name: string; amount: number }) => {
+export const TransactionItem = (props: {
+    name: string;
+    amount: number;
+    type: string;
+}) => {
     let amountString = "± 0";
     let amountColor = "yellow.400";
-    if (props.amount > 0) {
+    if (props.type == "payout") {
         amountString = "+ " + props.amount.toLocaleString();
         amountColor = "green.400";
-    }
-    if (props.amount < 0) {
+    } else {
         amountString = "- " + Math.abs(props.amount).toLocaleString();
         amountColor = "red.400";
     }

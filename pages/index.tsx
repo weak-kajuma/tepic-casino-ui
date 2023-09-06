@@ -121,6 +121,7 @@ const Page: NextPage<StatusLatestTransactions> = (props) => {
                                     name={e.nickname}
                                     amount={e.amount}
                                     key={e.transaction_id}
+                                    type={e.type}
                                 />
                             ))}
                         </Stack>
