@@ -1,4 +1,26 @@
+import { NextPage } from "next"
+import { useSearchParams } from "next/navigation"
 import QRCodeStyling from "qr-code-styling"
+import { useEffect } from "react"
+
+const Page: NextPage = () => {
+    const searchParams = useSearchParams()
+
+    useEffect(() => {
+        downloadQRCode(searchParams.get("id")!, searchParams.get("token")!)
+    },[searchParams])
+
+    return (<>
+        <a href="/admin/accounts" className="ubuntu">Return to User List</a>
+        <style jsx>{`
+            .ubuntu {
+                font-family: 'Ubuntu', sans-serif;
+            }
+        `}    
+        </style>
+    </>
+    )
+}
 
 const downloadQRCode = async (user_id: string, token: string) => {
     const qrcode = new QRCodeStyling({
@@ -30,16 +52,18 @@ const downloadQRCode = async (user_id: string, token: string) => {
     img.src = URL.createObjectURL(rawData!)
     img.onload = () => {
         const canvas = document.createElement("canvas")
-        canvas.width, canvas.height = 300, 250
+        canvas.width = 250
+        canvas.height = 300
         const ctx = canvas.getContext("2d")
         ctx!.drawImage(img, 0, 0)
         ctx!.font = "48px Ubuntu"
         ctx!.fillText(user_id, 65, 285)
         const link = document.createElement("a")
         link.href = canvas.toDataURL("image/png")
-        link.download = "qr.png"
+        link.download = `${user_id}.png`
         link.click()
+        window.close()
     }
 }
 
-export default downloadQRCode
+export default Page

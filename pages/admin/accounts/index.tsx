@@ -156,13 +156,13 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                                     },
                                                 };
 
-                                                const array: number[] = []
-                                                for (let i = 0;i < amo;i++) array.push(i)
-                                                Promise.all(array.map(async () => {
-                                                    fetch(`${endpoint}/users`, {method: "POST",headers: {Authorization: `Bearer ${props.idToken}`}})
-                                                    .then(res => res.json())
-                                                    .then((user: CreateUserResponse) => Router.push(encodeURI(`/admin/accounts/qrcode/?id=${user.user_id}&token=${user.token}`)))
-                                                }))
+                                                (async () => {
+                                                    for (let i = 0;i < amo;i++) {
+                                                        await fetch(`${endpoint}/users`, {method: "POST", headers: {Authorization: `Bearer ${props.idToken}`}})
+                                                        .then(res => res.json())
+                                                        .then((user: CreateUserResponse) => window.open(encodeURI(`/admin/accounts/qrcode/?id=${user.user_id}&token=${user.token}`), '_blank', 'noopener,noreferrer'))
+                                                    }
+                                                })()
                                                 .then(async () => {
                                                     toast({title: "Successed to create",
                                                             status: "success",
