@@ -10,8 +10,6 @@ export const TransactionItem = (props: {
     if (props.type == "") {
         amountString = "- " + Math.abs(props.amount).toLocaleString();
         amountColor = "red.400";
-        amountString = "+ " + props.amount.toLocaleString();
-        amountColor = "green.400";
     } else {
         amountString = "+ " + props.amount.toLocaleString();
         amountColor = "green.400";
