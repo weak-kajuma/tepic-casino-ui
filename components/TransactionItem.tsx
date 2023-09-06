@@ -7,12 +7,14 @@ export const TransactionItem = (props: {
 }) => {
     let amountString = "± 0";
     let amountColor = "yellow.400";
-    if (props.type == "payout") {
+    if (props.type == "") {
+        amountString = "- " + Math.abs(props.amount).toLocaleString();
+        amountColor = "red.400";
         amountString = "+ " + props.amount.toLocaleString();
         amountColor = "green.400";
     } else {
-        amountString = "- " + Math.abs(props.amount).toLocaleString();
-        amountColor = "red.400";
+        amountString = "+ " + props.amount.toLocaleString();
+        amountColor = "green.400";
     }
     return (
         <Box bgColor={"white"}>
