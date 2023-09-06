@@ -28,6 +28,7 @@ import { decodeJwt } from "../../utils/decode";
 import { EditIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { endpoint } from "../../types/api";
+import axios from "axios";
 
 type UserInfo = {
     user_id: string;
@@ -218,15 +219,17 @@ export const getServerSideProps: GetServerSideProps<StatusUserProps> = async (
             },
         };
     }
-    const res = await fetch(`${endpoint}/users/${id}`);
-    const data: UserInfo = await res.json().catch(() => {
-        return {
-            redirect: {
-                permanent: false,
-                destination: "/",
-            },
-        };
-    });
+    const data: UserInfo = await axios
+        .get(`${endpoint}/users/${id}`)
+        .then((res) => res.data)
+        .catch(() => {
+            return {
+                redirect: {
+                    permanent: false,
+                    destination: "/",
+                },
+            };
+        });
 
     if (data.user_id !== id) {
         return {
