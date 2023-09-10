@@ -7,7 +7,7 @@ export const TransactionItem = (props: {
 }) => {
     let amountString = "± 0";
     let amountColor = "yellow.400";
-    if (props.type == "payment") {
+    if (props.type == "payment" || props.type == "bet") {
         amountString = "- " + Math.abs(props.amount).toLocaleString();
         amountColor = "red.400";
     } else {
