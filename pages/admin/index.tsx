@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     Card,
     CardBody,
@@ -6,6 +7,7 @@ import {
     CardHeader,
     Heading,
     SimpleGrid,
+    Spacer,
     Text,
     VStack,
 } from "@chakra-ui/react";
@@ -134,6 +136,25 @@ const Page: NextPage = () => {
                     </CardFooter>
                 </Card>
             </SimpleGrid>
+            <Card width={680}>
+                <CardHeader>
+                    <Heading size="md">KRA</Heading>
+                </CardHeader>
+                <CardBody>
+                    <Text>馬ッカス</Text>
+                </CardBody>
+                <CardFooter>
+                    <Link href="/admin/kra">
+                        <Button
+                            bgColor="pink.400"
+                            _hover={{ bgColor: "pink.500" }}
+                        >
+                            Click
+                        </Button>
+                    </Link>
+                </CardFooter>
+            </Card>
+            <Box h={30}></Box>
         </VStack>
     );
 };

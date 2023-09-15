@@ -173,14 +173,7 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                     (transaction) => (
                                         <TransactionItem
                                             name={userData?.nickname}
-                                            amount={
-                                                [1, -1][
-                                                    Number(
-                                                        transaction.type ===
-                                                            "bet"
-                                                    )
-                                                ] * transaction.amount
-                                            }
+                                            amount={transaction.amount}
                                             type={transaction.type}
                                             key={transaction.transaction_id}
                                         />
