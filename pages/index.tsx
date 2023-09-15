@@ -109,6 +109,17 @@ const Page: NextPage<StatusLatestTransactions> = (props) => {
                         </CardFooter>
                     </Card>
                 </SimpleGrid>
+                <Link as={NextLink} href="/kra">
+                    <Button
+                        bgColor="blue.400"
+                        _hover={{ bgColor: "blue.500" }}
+                        color="white"
+                        w={680}
+                    >
+                        KRA
+                    </Button>
+                </Link>
+                <Spacer />
                 <Card width={"60%"}>
                     <CardHeader>
                         <Heading size="md">最近の履歴</Heading>

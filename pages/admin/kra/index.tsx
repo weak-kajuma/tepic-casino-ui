@@ -40,7 +40,7 @@ import { useForceUpdate } from "framer-motion";
 import { NextPage, GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
 import { useState } from "react";
-import { KraEndpoint, Ticket } from "../../../utils/KRA";
+import { FormationTicket, KraEndpoint, Ticket } from "../../../utils/KRA";
 import readQRCode from "../../../utils/popupQrcodeReader";
 
 interface ModalTicketOption {
@@ -453,6 +453,20 @@ const FormationModal = (props: {
         [setFirst, setSecond, setThird][place](copy);
     };
 
+    const getHorseNumber = (place: number): number[] => {
+        let horse: number[] = [];
+        [first, second, third][place].forEach((h, i) => {
+            if (h) horse.push(i + 1);
+        });
+        return horse;
+    };
+
+    const getAllHorseNumber: number[] = [
+        ...getHorseNumber(0),
+        ...getHorseNumber(1),
+        ...getHorseNumber(2),
+    ];
+
     const [update] = useForceUpdate();
 
     return (
@@ -571,12 +585,26 @@ const FormationModal = (props: {
                             <Button
                                 bgColor="blue.400"
                                 _hover={{ bgColor: "blue.500" }}
-                                onClick={() => {
+                                onClick={async () => {
                                     if (type === "") return;
-                                    if (type == "馬単") {
-                                    }
-                                    if (type == "三連単") {
-                                    }
+                                    const user_id = await readQRCode(
+                                        "^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token="
+                                    ).then((res) => res.slice(39, 43));
+                                    const ticket: FormationTicket = {
+                                        user_id: user_id,
+                                        f: getHorseNumber(0),
+                                        s: getHorseNumber(1),
+                                        t: getHorseNumber(2),
+                                        type: type,
+                                        option: "NO",
+                                        optNum: props.amount,
+                                        bet: bet,
+                                        race: props.id,
+                                    };
+                                    await axios.post(
+                                        `${KraEndpoint}/ticket/add/formation`,
+                                        ticket
+                                    );
                                     props.onClose();
                                 }}
                                 w="50%"

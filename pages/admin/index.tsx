@@ -141,7 +141,7 @@ const Page: NextPage = () => {
                     <Heading size="md">KRA</Heading>
                 </CardHeader>
                 <CardBody>
-                    <Text>馬ッカス</Text>
+                    <Text>コウメ太夫</Text>
                 </CardBody>
                 <CardFooter>
                     <Link href="/admin/kra">
