@@ -16,6 +16,7 @@ import { RepeatClockIcon, TimeIcon } from "@chakra-ui/icons";
 import { useToast } from "@chakra-ui/toast";
 import Link from "next/link";
 import { GetServerSideProps, NextPage } from "next";
+import { useRouter } from "next/router";
 
 const endpoint = process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";
 
@@ -34,8 +35,9 @@ const Page: NextPage<StatusRankingProps> = (props) => {
     const [rankings, setRankings] = useState(props.users);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const toast = useToast();
+    const router = useRouter()
     useEffect(() => {
-        axios.get(endpoint + "/rankings").then((res) => {
+        axios.get(`${endpoint}/rankings/${router.query.times}`).then((res) => {
             setIsLoading(true);
             setRankings(res.data);
             setIsLoading(false);
@@ -56,7 +58,7 @@ const Page: NextPage<StatusRankingProps> = (props) => {
                         isLoading={isLoading}
                         onClick={() => {
                             setIsLoading(true);
-                            axios.get(endpoint + "/rankings").then((res) => {
+                            axios.get(`${endpoint}/rankings/${router.query.times}`).then((res) => {
                                 setRankings(res.data);
                                 toast({
                                     title: "Reloaded!",
@@ -142,7 +144,7 @@ export default Page;
 export const getServerSideProps: GetServerSideProps<StatusRankingProps> = async (
     context
 ) => {
-    const users: RankingResponse[] = await axios.get(`${endpoint}/rankings`).then((res) => res.data)
+    const users: RankingResponse[] = await axios.get(`${endpoint}/rankings/${context.query.times}`).then((res) => res.data)
 
     return { props: { users } };
 };
