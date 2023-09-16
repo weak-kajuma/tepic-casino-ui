@@ -110,14 +110,14 @@ const Page: NextPage<StatusLatestTransactions> = (props) => {
                         </CardFooter>
                     </Card>
                 </SimpleGrid>
-                <Link as={NextLink} href="/kra">
+                <Link as={NextLink} href="/admin">
                     <Button
-                        bgColor="blue.400"
-                        _hover={{ bgColor: "blue.500" }}
+                        bgColor="red.400"
+                        _hover={{ bgColor: "red.500" }}
                         color="white"
                         w={680}
                     >
-                        KRA
+                        Admin
                     </Button>
                 </Link>
                 <Spacer />
