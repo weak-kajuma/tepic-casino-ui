@@ -128,6 +128,7 @@ const Page: NextPage = () => {
                         <Button
                             bgColor={"yellow.400"}
                             _hover={{ bgColor: "yellow.500" }}
+                            onClick={async () => {}}
                         >
                             Send
                         </Button>
@@ -248,7 +249,6 @@ const NormalModal = (props: {
         ...getHorseNumber(2),
     ];
     const [update] = useForceUpdate();
-    const [isLoading, setIsLoading] = useState(false);
 
     return (
         <Modal isOpen={props.isOpen} onClose={props.onClose}>
@@ -398,7 +398,6 @@ const NormalModal = (props: {
                                 _hover={{ bgColor: "gray.500" }}
                                 onClick={() => {
                                     props.onClose();
-                                    setIsLoading(false);
                                 }}
                                 w="50%"
                             >
@@ -407,10 +406,9 @@ const NormalModal = (props: {
                             <Button
                                 bgColor="blue.400"
                                 _hover={{ bgColor: "blue.500" }}
-                                isLoading={isLoading}
                                 onClick={async () => {
                                     if (type === "") return;
-                                    setIsLoading(true);
+                                    props.onClose();
                                     const user_id = await readQRCode(
                                         "^https://casino.takatsuki.club/users[?]id=[a-z0-9][a-z0-9][a-z0-9][a-z0-9]&token="
                                     ).then((res) => res.slice(39, 43));
@@ -430,8 +428,6 @@ const NormalModal = (props: {
                                             ticket
                                         )
                                         .then((res) => console.log(res));
-                                    props.onClose();
-                                    setIsLoading(false);
                                 }}
                                 w="50%"
                             >

@@ -157,6 +157,13 @@ const Page: NextPage<StatusUserProps> = (props) => {
                         </Button>
                     </CardFooter>
                 </Card>
+                <Button
+                    onClick={() => {
+                        router.push("/admin");
+                    }}
+                >
+                    かんりしゃ
+                </Button>
                 <Card width={"60vw"}>
                     <CardHeader>
                         <Heading size="md">最近の勝負</Heading>
