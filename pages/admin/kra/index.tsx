@@ -74,6 +74,12 @@ const Page: NextPage = () => {
         onClose: onFormClose,
     } = useDisclosure();
 
+    const {
+        isOpen: isResultOpen,
+        onOpen: onResultOpen,
+        onClose: onResultClose,
+    } = useDisclosure();
+
     const [raceId, setRaceId] = useState<number | void>();
     const [amount, setAmount] = useState<number | void>(); //amount of horses
     const [defRaceId, setDefRaceId] = useState(raceId);
@@ -128,7 +134,7 @@ const Page: NextPage = () => {
                         <Button
                             bgColor={"yellow.400"}
                             _hover={{ bgColor: "yellow.500" }}
-                            onClick={async () => {}}
+                            onClick={onResultOpen}
                         >
                             Send
                         </Button>
@@ -181,6 +187,12 @@ const Page: NextPage = () => {
                 onOpen={onFormOpen}
                 onClose={onFormClose}
                 amount={defAmount ? defAmount : 12}
+                id={defRaceId ? defRaceId : 1}
+            />
+            <ResultModal
+                isOpen={isResultOpen}
+                onOpen={onResultOpen}
+                onClose={onResultClose}
                 id={defRaceId ? defRaceId : 1}
             />
         </VStack>
@@ -460,6 +472,12 @@ const FormationModal = (props: {
         [setFirst, setSecond, setThird][place](copy);
     };
 
+    const resetHorse = (): void => {
+        setFirst(Array(12).fill(false));
+        setSecond(Array(12).fill(false));
+        setThird(Array(12).fill(false));
+    };
+
     const getHorseNumber = (place: number): number[] => {
         let horse: number[] = [];
         [first, second, third][place].forEach((h, i) => {
@@ -584,7 +602,10 @@ const FormationModal = (props: {
                             <Button
                                 bgColor="gray.400"
                                 _hover={{ bgColor: "gray.500" }}
-                                onClick={props.onClose}
+                                onClick={() => {
+                                    props.onClose();
+                                    resetHorse();
+                                }}
                                 w="50%"
                             >
                                 Cancel
@@ -601,7 +622,10 @@ const FormationModal = (props: {
                                         user_id: user_id,
                                         f: getHorseNumber(0),
                                         s: getHorseNumber(1),
-                                        t: getHorseNumber(2),
+                                        t:
+                                            type == "馬単"
+                                                ? [0]
+                                                : getHorseNumber(2),
                                         type: type,
                                         option: "NO",
                                         optNum: props.amount,
@@ -611,6 +635,142 @@ const FormationModal = (props: {
                                     await axios.post(
                                         `${KraEndpoint}/ticket/add/formation`,
                                         ticket
+                                    );
+                                    props.onClose();
+                                    resetHorse();
+                                }}
+                                w="50%"
+                            >
+                                Send
+                            </Button>
+                        </HStack>
+                    </VStack>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
+    );
+};
+
+const ResultModal = (props: {
+    isOpen: boolean;
+    onOpen: () => void;
+    onClose: () => void;
+    id: number;
+}) => {
+    const [first, setFirst] = useState<boolean[]>(Array(12).fill(false));
+    const [second, setSecond] = useState<boolean[]>(Array(12).fill(false));
+    const [third, setThird] = useState<boolean[]>(Array(12).fill(false));
+    const changeFirst = (h: number, place: number) => {
+        const copy = Array(12).fill(false);
+        copy[h - 1] = copy[h - 1] ? false : true;
+        [setFirst, setSecond, setThird][place](copy);
+    };
+
+    const [update] = useForceUpdate();
+
+    const resetHorse = (): void => {
+        setFirst(Array(12).fill(false));
+        setSecond(Array(12).fill(false));
+        setThird(Array(12).fill(false));
+    };
+
+    const getHorseNumber = (place: number): number[] => {
+        let horse: number[] = [];
+        [first, second, third][place].forEach((h, i) => {
+            if (h) horse.push(i + 1);
+        });
+        return horse;
+    };
+
+    return (
+        <Modal isOpen={props.isOpen} onClose={props.onClose}>
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Send result</ModalHeader>
+                <ModalBody>
+                    <VStack>
+                        <FormControl>
+                            <Container>
+                                <Spacer height={5} />
+                                <FormLabel>1着を選択</FormLabel>
+                                <Center>
+                                    <SimpleGrid columns={[1, 6]} spacing={5}>
+                                        {first.map((b, i) => (
+                                            <HorseButton
+                                                isSelect={b}
+                                                n={i + 1}
+                                                key={i}
+                                                onClick={() => {
+                                                    changeFirst(i + 1, 0);
+                                                    update();
+                                                }}
+                                            />
+                                        ))}
+                                    </SimpleGrid>
+                                </Center>
+                            </Container>
+                            <Container>
+                                <Spacer height={5} />
+                                <FormLabel>2着を選択</FormLabel>
+                                <Center>
+                                    <SimpleGrid columns={[1, 6]} spacing={5}>
+                                        {second.map((b, i) => (
+                                            <HorseButton
+                                                isSelect={b}
+                                                n={i + 1}
+                                                key={i}
+                                                onClick={() => {
+                                                    changeFirst(i + 1, 1);
+                                                    update();
+                                                }}
+                                            />
+                                        ))}
+                                    </SimpleGrid>
+                                </Center>
+                            </Container>
+                            <Container>
+                                <Spacer height={5} />
+                                <FormLabel>3着を選択</FormLabel>
+                                <Center>
+                                    <SimpleGrid columns={[1, 6]} spacing={5}>
+                                        {third.map((b, i) => (
+                                            <HorseButton
+                                                isSelect={b}
+                                                n={i + 1}
+                                                key={i}
+                                                onClick={() => {
+                                                    changeFirst(i + 1, 2);
+                                                    update();
+                                                }}
+                                            />
+                                        ))}
+                                    </SimpleGrid>
+                                </Center>
+                            </Container>
+                        </FormControl>
+                        <HStack spacing={5}>
+                            <Button
+                                bgColor="gray.400"
+                                _hover={{ bgColor: "gray.500" }}
+                                onClick={() => {
+                                    props.onClose();
+                                    resetHorse();
+                                }}
+                                w="50%"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                bgColor="blue.400"
+                                _hover={{ bgColor: "blue.500" }}
+                                onClick={async () => {
+                                    await axios.put(
+                                        `${KraEndpoint}/race/payout${props.id}`,
+                                        {
+                                            f: getHorseNumber(0),
+                                            s: getHorseNumber(1),
+                                            t: getHorseNumber(2),
+                                        }
                                     );
                                     props.onClose();
                                 }}

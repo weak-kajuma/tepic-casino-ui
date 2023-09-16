@@ -28,6 +28,7 @@ import { EditIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { endpoint } from "../../types/api";
 import axios from "axios";
+import { transcode } from "buffer";
 
 type UserInfo = {
     user_id: string;
@@ -133,7 +134,11 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                         `${endpoint}/users/${id}`
                                     );
                                     const user: UserInfo = await res.json();
-                                    user.transaction_history.reverse();
+                                    user.transaction_history
+                                        .sort((a, b) =>
+                                            a.timestamp > b.timestamp ? 1 : -1
+                                        )
+                                        .reverse();
                                     setUserData(user);
                                     setIsLoading(false);
                                     toast({
@@ -157,13 +162,6 @@ const Page: NextPage<StatusUserProps> = (props) => {
                         </Button>
                     </CardFooter>
                 </Card>
-                <Button
-                    onClick={() => {
-                        router.push("/admin");
-                    }}
-                >
-                    かんりしゃ
-                </Button>
                 <Card width={"60vw"}>
                     <CardHeader>
                         <Heading size="md">最近の勝負</Heading>
@@ -177,6 +175,7 @@ const Page: NextPage<StatusUserProps> = (props) => {
                                         name={userData?.nickname}
                                         amount={transaction.amount}
                                         type={transaction.type}
+                                        time={transaction.timestamp}
                                         key={transaction.transaction_id}
                                     />
                                 )
@@ -235,7 +234,9 @@ export const getServerSideProps: GetServerSideProps<StatusUserProps> = async (
         };
     }
 
-    data.transaction_history.reverse();
+    data.transaction_history
+        .sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+        .reverse();
 
     return { props: { id, data, secure, token } };
 };
