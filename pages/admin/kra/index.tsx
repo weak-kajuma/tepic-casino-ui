@@ -776,7 +776,7 @@ const ResultModal = (props: {
                                 _hover={{ bgColor: "blue.500" }}
                                 onClick={async () => {
                                     await axios.put(
-                                        `${KraEndpoint}/race/payout${props.id}`,
+                                        `${KraEndpoint}/race/payout/${props.id}`,
                                         {
                                             f: getHorseNumber(0),
                                             s: getHorseNumber(1),
