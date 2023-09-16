@@ -222,9 +222,16 @@ const NormalModal = (props: {
     const [second, setSecond] = useState<boolean[]>(Array(12).fill(false));
     const [third, setThird] = useState<boolean[]>(Array(12).fill(false));
     const changeFirst = (h: number, place: number) => {
-        const copy = Array(12).fill(false);
-        copy[h - 1] = true;
+        const copy = [first, second, third][place];
+        copy[h - 1] = copy[h - 1] ? false : true;
         [setFirst, setSecond, setThird][place](copy);
+        console.log([first, second, third][place]);
+    };
+
+    const resetHorse = (): void => {
+        setFirst(Array(12).fill(false));
+        setSecond(Array(12).fill(false));
+        setThird(Array(12).fill(false));
     };
 
     const getHorseNumber = (place: number): number[] => {
@@ -259,6 +266,7 @@ const NormalModal = (props: {
                                     onChange={(e) => {
                                         setType(e.target.value);
                                         setOption("");
+                                        resetHorse();
                                     }}
                                     value={type}
                                 >
@@ -281,7 +289,10 @@ const NormalModal = (props: {
                                 <Select
                                     placeholder="Select Option"
                                     bgColor="white"
-                                    onChange={(e) => setOption(e.target.value)}
+                                    onChange={(e) => {
+                                        setOption(e.target.value);
+                                        resetHorse();
+                                    }}
                                     value={option}
                                 >
                                     <AllOptionItem v={type} />

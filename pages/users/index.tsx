@@ -22,7 +22,6 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { TransactionItem } from "../../components/TransactionItem";
-import { BrowserView } from "react-device-detect";
 import { GetServerSideProps, NextPage } from "next";
 import { decodeJwt } from "../../utils/decode";
 import { EditIcon } from "@chakra-ui/icons";

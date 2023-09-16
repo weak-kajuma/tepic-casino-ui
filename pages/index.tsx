@@ -21,6 +21,7 @@ import { GetServerSideProps, NextPage } from "next";
 import { useState } from "react";
 import readQRCode from "../utils/popupQrcodeReader";
 import Router from "next/router";
+import axios from "axios";
 
 const endpoint =
     process.env.ENDPOINT ?? "https://money-manager-api.takatsuki.club";
@@ -159,9 +160,8 @@ export default Page;
 export const getServerSideProps: GetServerSideProps<
     StatusLatestTransactions
 > = async () => {
-    const transactions: Transaction[] = await fetch(
-        `${endpoint}/transactions?limit=100`
-    ).then((res) => res.json());
+    const res = await axios.get(`${endpoint}/transactions?limit=100`);
+    const transactions: Transaction[] = res.data;
 
     return { props: { transactions } };
 };
