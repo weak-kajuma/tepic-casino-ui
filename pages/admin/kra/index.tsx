@@ -235,7 +235,8 @@ const NormalModal = (props: {
     const [second, setSecond] = useState<boolean[]>(Array(12).fill(false));
     const [third, setThird] = useState<boolean[]>(Array(12).fill(false));
     const changeFirst = (h: number, place: number) => {
-        const copy = [first, second, third][place];
+        let copy = [first, second, third][place];
+        if (option != "BOX") copy = Array(12).fill(false);
         copy[h - 1] = copy[h - 1] ? false : true;
         [setFirst, setSecond, setThird][place](copy);
         console.log([first, second, third][place]);
@@ -360,7 +361,8 @@ const NormalModal = (props: {
                                         type == "三連単"
                                     ) ||
                                     option == "WHEEL" ||
-                                    option == "WHEEL_FIRST"
+                                    option == "WHEEL_FIRST" ||
+                                    option == "BOX"
                                 }
                             >
                                 <Spacer height={5} />
@@ -382,7 +384,13 @@ const NormalModal = (props: {
                                 </Center>
                             </Container>
                             <Container
-                                hidden={!(type == "三連複" || type == "三連単")}
+                                hidden={
+                                    !(type == "三連複" || type == "三連単") ||
+                                    option == "BOX" ||
+                                    option == "WHEEL_FIRST" ||
+                                    option == "WHEEL_SECOND" ||
+                                    option == "WHEEL_TO_SECOND"
+                                }
                             >
                                 <Spacer height={5} />
                                 <FormLabel>3着を選択</FormLabel>
@@ -507,7 +515,10 @@ const FormationModal = (props: {
                                 <Select
                                     placeholder="Select Type"
                                     bgColor="white"
-                                    onChange={(e) => setType(e.target.value)}
+                                    onChange={(e) => {
+                                        setType(e.target.value);
+                                        resetHorse();
+                                    }}
                                     value={type}
                                 >
                                     <TypeItem v="馬単" />
